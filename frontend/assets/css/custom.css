@@ -1,0 +1,72 @@
+/*
+Custom CSS for TemplateMo 561 Purple Buzz
+
+https://templatemo.com/tm-561-purple-buzz
+
+*/
+
+.header-banner {
+    /* background-image: url('./../img/banner-bg.JPG'); 
+    background-position: right center;
+    background-size: contain;
+    background-repeat: no-repeat;*/
+    height: 100%;
+    width: 100%;
+}
+
+.logo-small {
+    max-height: 3rem;
+    padding-bottom: 1rem;
+    margin-right: 0.5rem;
+}
+
+.course-logo {
+    max-width: 80%;
+    max-height: 100px;
+}
+
+.course-card-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.diffculty-star {
+    font-size: x-large;
+    color: yellow;
+    padding: 0.1em;
+    text-shadow: 0 0 2px #555;
+}
+
+.discount-icon {
+    font-size: 3rem;
+    font-weight: bolder;
+}
+
+.footer-icon {
+    font-size: medium;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    font-weight: bolder;
+}
+
+.ul-head-font {
+    font-size: x-large;
+    font-weight: 500;
+}
+
+.ul-item-font {
+    color: #6c757d;
+    font-size: large;
+}
+
+.w-90 {
+    width: 90%!important;
+}
+
+@media screen and (max-width: 1024px) {
+    .diffculty-star {
+        font-size: medium;
+    }
+}
