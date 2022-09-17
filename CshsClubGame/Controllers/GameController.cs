@@ -1,5 +1,7 @@
 using CshsClubGame.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace CshsClubGame.Controllers
 {
@@ -86,25 +88,22 @@ namespace CshsClubGame.Controllers
             return Ok(result);
         }
 
+        [HttpPost("SelectCard")]
+        public ActionResult SelectCard([FromHeader] string selfId, JsonObject card)
+        {
+            var record = _gameManager.ProcessTurnCard(selfId, card);
+            if (record != null)
+            {
+                return Ok(card);
+            }
+            return BadRequest("未定義的卡片類型");
+        }
+
         [HttpPost("Battle")]
         public ActionResult Battle(string playerId, string targetId)
         {
-            string? roomId = _gameManager.GetRoomIdByPlayerId(playerId);
-            if (string.IsNullOrEmpty(roomId))
-            {
-                return BadRequest("找不到玩家的房間");
-            }
-
-            var player = _gameManager.GetPlayer(playerId);
-            var target = _gameManager.GetPlayer(targetId);
-            string validateResult = _gameManager.ValidateBattle(roomId, player, target);
-            if (validateResult != "OK")
-            {
-                return BadRequest(validateResult);
-            }
-
-            var battleResult = _gameManager.ProcessBattle(player, target);
-            return Ok(battleResult);
+            
+            return Ok();
         }
     }
 }

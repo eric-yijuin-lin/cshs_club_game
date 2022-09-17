@@ -1,4 +1,7 @@
-﻿namespace CshsClubGame.Models
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+
+namespace CshsClubGame.Models
 {
     public class GameManager
     {
@@ -13,24 +16,6 @@
             _rooms = new Dictionary<string, GameRoom>();
             _lootHelper = lootHelper;
             _cardHelper = cardHelper;
-        }
-
-        private void DeletePlayer(Player player)
-        {
-            _players.Remove(player.Id);
-            this.MovePlayerOutFromRoom(player);
-        }
-
-        private void MovePlayerOutFromRoom(Player player)
-        {
-            foreach (var kvp in _rooms)
-            {
-                if (kvp.Value.IsPlayerInRoom(player.Id))
-                {
-                    kvp.Value.RemovePlayer(player);
-                }
-            }
-            player.RoomId = null;
         }
 
         public GameRoom CreateRoom(string roomName, int maxPlayer)
@@ -104,7 +89,79 @@
             return _cardHelper.GetTurnCards(playerId, _players);
         }
 
-        public string ValidateBattle(string roomId, Player? player, Player? target)
+        public TurnRecord? ProcessTurnCard(string selfId, JsonObject card)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            string? cardType = card["cardType"]?.GetValue<string>();
+            switch (cardType)
+            {
+                case "角色":
+                    var charaterCard = card.Deserialize<CharaterCard>(options);
+                    return this.ProcessBattleCard(selfId, charaterCard);
+                case "裝備":
+                    var equipmentCard = card.Deserialize<EquipmentCard>(options);
+                    return this.ProcessEquipmentCard(selfId, equipmentCard);
+                case "事件":
+                    var eventCard = card.Deserialize<EventCard>(options);
+                    return this.ProcessEventCard(selfId, eventCard);
+                default:
+                    return null;
+            }
+        }
+
+        private void DeletePlayer(Player player)
+        {
+            _players.Remove(player.Id);
+            this.MovePlayerOutFromRoom(player);
+        }
+
+        private void MovePlayerOutFromRoom(Player player)
+        {
+            foreach (var kvp in _rooms)
+            {
+                if (kvp.Value.IsPlayerInRoom(player.Id))
+                {
+                    kvp.Value.RemovePlayer(player);
+                }
+            }
+            player.RoomId = null;
+        }
+
+        private TurnRecord ProcessBattleCard(string selfId, CharaterCard? charaterCard)
+        {
+            if (charaterCard == null || string.IsNullOrEmpty(charaterCard.Id))
+            {
+                throw new InvalidDataException("對手 ID 不可為空");
+            }
+            string? roomId = this.GetRoomIdByPlayerId(selfId);
+            if (string.IsNullOrEmpty(roomId))
+            {
+                throw new InvalidDataException("找不到玩家的房間");
+            }
+
+            var self = this.GetPlayer(selfId);
+            var target = this.GetPlayer(charaterCard.Id);
+            string validateResult = this.ValidateBattle(roomId, self, target);
+            if (validateResult != "OK")
+            {
+                throw new InvalidDataException(validateResult);
+            }
+
+            var battleRecord = this.ProcessBattle(self, target);
+            self.SurvivedDay += 1;
+            return new TurnRecord()
+            {
+                BattleRecord = battleRecord,
+                SelfStatus = self,
+                TurnType = "角色"
+            };
+        }
+
+        private string ValidateBattle(string roomId, Player? player, Player? target)
         {
             if (player == null || target == null)
             {
@@ -126,9 +183,10 @@
             return "OK";
         }
 
-        public BattleRecord ProcessBattle(Player player, Player target)
+        private BattleRecord ProcessBattle(Player player, Player target)
         {
             player.Hp -= target.Atk;
+            player.SurvivedDay += 1;
             target.Hp -= player.Atk;
             var battleResult = new BattleRecord()
             {
@@ -143,11 +201,79 @@
             }
             if (target.Hp <= 0)
             {
+                int exp = _lootHelper.GetLootExp(player, target);
+                var equipment = _lootHelper.GetLootEquipment(target);
+                player.AddExp(exp);
+                player.AddEquipment(equipment);
+                battleResult.LootExp = exp;
+                battleResult.LootExpEquipment = equipment;
                 this.DeletePlayer(target);
-                battleResult.LootExp = _lootHelper.GetLootExp(player, target);
-                battleResult.LootExpEquipment = _lootHelper.GetLootEquipment(target);
             }
             return battleResult;
+        }
+
+        private TurnRecord ProcessEquipmentCard(string selfId, EquipmentCard? equipmentCard)
+        {
+            var player = this.GetPlayer(selfId);
+            this.ValidateEquipmentTurn(player, equipmentCard);
+
+            var equip = equipmentCard!.ConvertToEquipment();
+            player!.AddEquipment(equip);
+            player!.SurvivedDay += 1;
+            return new TurnRecord()
+            {
+                BattleRecord = null,
+                SelfStatus = player,
+                TurnType = "裝備"
+            };
+        }
+
+        private void ValidateEquipmentTurn(Player? player, EquipmentCard? equipmentCard)
+        {
+            if (player == null)
+            {
+                throw new InvalidDataException("驗證裝備卡失敗：找不到人物");
+            }
+            if (equipmentCard == null)
+            {
+                throw new InvalidDataException("驗證裝備卡失敗：裝備不可為空");
+            }
+            if (string.IsNullOrEmpty(equipmentCard.Title)
+                || equipmentCard.EnhancedHp == 0 
+                || equipmentCard.EnhancedAtk == 0)
+            {
+                throw new InvalidDataException("驗證裝備卡失敗：無效的裝備屬性");
+            }
+        }
+
+        private TurnRecord ProcessEventCard(string selfId, EventCard? eventCard)
+        {
+            var player = this.GetPlayer(selfId);
+            this.ValidateEventTurn(player, eventCard);
+            player!.Rest(eventCard!);
+            player!.SurvivedDay += 1;
+            return new TurnRecord()
+            {
+                BattleRecord = null,
+                SelfStatus = player,
+                TurnType = "事件"
+            };
+        }
+
+        private void ValidateEventTurn(Player? player, EventCard? eventCard)
+        {
+            if (player == null)
+            {
+                throw new InvalidDataException("驗證事件卡失敗：找不到人物");
+            }
+            if (eventCard == null)
+            {
+                throw new InvalidDataException("驗證事件卡失敗：事件不可為空");
+            }
+            if (string.IsNullOrEmpty(eventCard.Title) || eventCard.Amount == 0)
+            {
+                throw new InvalidDataException("驗證事件卡失敗：無效的事件設定");
+            }
         }
     }
 }

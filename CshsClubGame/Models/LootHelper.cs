@@ -28,19 +28,6 @@
             new Equipment() { Quality = "史詩", Name = "美國隊長盾牌", EnhancedAtk = 25, EnhancedHp = 40},
             new Equipment() { Quality = "史詩", Name = "索爾的槌子", EnhancedAtk = 40, EnhancedHp = 0},
         };
-        private static readonly Dictionary<int, LevelInfo> _levelInfo = new Dictionary<int, LevelInfo>()
-        {
-            { 1, new LevelInfo() { RequiredExp = 30, LootExp = 50} },
-            { 2, new LevelInfo() { RequiredExp = 70, LootExp = 50} },
-            { 3, new LevelInfo() { RequiredExp = 120, LootExp = 70} },
-            { 4, new LevelInfo() { RequiredExp = 170, LootExp = 80} },
-            { 5, new LevelInfo() { RequiredExp = 220, LootExp = 100} },
-            { 6, new LevelInfo() { RequiredExp = 300, LootExp = 120} },
-            { 7, new LevelInfo() { RequiredExp = 400, LootExp = 150} },
-            { 8, new LevelInfo() { RequiredExp = 500, LootExp = 200} },
-            { 9, new LevelInfo() { RequiredExp = 650, LootExp = 250} },
-            { 10, new LevelInfo() { RequiredExp = 0, LootExp = 400} },
-        };
 
         public static Equipment GetRandomEquipment()
         {
@@ -65,7 +52,7 @@
 
         public int GetLootExp(Player player, Player target)
         {
-            var levelInfo = _levelInfo[target.Level];
+            var levelInfo = LevelInfo.ExpMap[target.Level];
             int characterExp = levelInfo.LootExp;
             int equipExp = target.EquipmentList.Count * 100;
             return characterExp + equipExp;
@@ -86,12 +73,6 @@
                 return null;
             }
         }
-    }
-
-    public class LevelInfo
-    {
-        public int RequiredExp { get; set; }
-        public int LootExp { get; set; }
     }
 
     public class Equipment

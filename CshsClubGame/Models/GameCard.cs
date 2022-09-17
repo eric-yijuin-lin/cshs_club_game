@@ -132,6 +132,17 @@
     {
         public int EnhancedAtk { get; set; }
         public int EnhancedHp { get; set; }
+
+        public Equipment ConvertToEquipment()
+        {
+            return new Equipment()
+            {
+                EnhancedAtk = EnhancedAtk,
+                EnhancedHp = EnhancedHp,
+                Name = this.Title,
+                Quality = this.Quality
+            };
+        }
     }
 
     public class CharaterCard : GameCard
