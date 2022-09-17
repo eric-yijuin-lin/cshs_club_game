@@ -73,6 +73,21 @@
                 return null;
             }
         }
+
+        public int GetLootRankScore(Player? self, Player? target)
+        {
+            if (self == null || target == null)
+            {
+                throw new InvalidDataException("計算 rank 分數失敗：角色不可為空");
+            }
+            if (target.IsNpc)
+            {
+                return 0;
+            }
+            int levelDiff = target.Level - self.Level;
+            int multiplier = levelDiff < 1 ? 1 : levelDiff * levelDiff;
+            return multiplier * target.Level;
+        }
     }
 
     public class Equipment

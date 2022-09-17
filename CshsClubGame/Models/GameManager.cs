@@ -5,7 +5,7 @@ namespace CshsClubGame.Models
 {
     public class GameManager
     {
-        private const string LOBBY_ID = "e6553cf38154794e9a4fb7e3162b9f83"; // MD5 of "publicLobby" 
+        public const string LOBBY_ID = "e6553cf38154794e9a4fb7e3162b9f83"; // MD5 of "publicLobby" 
         private readonly Dictionary<string, Player> _players;
         private readonly Dictionary<string, GameRoom> _rooms;
         private readonly LootHelper _lootHelper;
@@ -82,12 +82,24 @@ namespace CshsClubGame.Models
             return null;
         }
 
-        public Player? GetPlayer(string playerId)
+        public Player? GetPlayerById(string playerId)
         {
             return _players[playerId];
         }
 
-        public List<GameCard> GetTurnCards(string playerId)
+        public Player? GetPlayerByCard(CharaterCard card)
+        {
+            if (card.Id == "npc")
+            {
+                return new Player(card);
+            }
+            else
+            {
+                return this.GetPlayerById(card.Id);
+            }
+        }
+
+        public List<GameCard> GetTurnCard(string playerId)
         {
             return _cardHelper.GetTurnCards(playerId, _players);
         }
@@ -146,8 +158,8 @@ namespace CshsClubGame.Models
                 throw new InvalidDataException("找不到玩家的房間");
             }
 
-            var self = this.GetPlayer(selfId);
-            var target = this.GetPlayer(charaterCard.Id);
+            Player? self = this.GetPlayerById(selfId);
+            Player? target = this.GetPlayerByCard(charaterCard);
             string validateResult = this.ValidateBattle(roomId, self, target);
             if (validateResult != "OK")
             {
@@ -186,29 +198,32 @@ namespace CshsClubGame.Models
             return "OK";
         }
 
-        private BattleRecord ProcessBattle(Player player, Player target)
+        private BattleRecord ProcessBattle(Player self, Player target)
         {
-            player.Hp -= target.Atk;
-            player.SurvivedDay += 1;
-            target.Hp -= player.Atk;
+            self.Hp -= target.Atk;
+            self.SurvivedDay += 1;
+            target.Hp -= self.Atk;
             var battleResult = new BattleRecord()
             {
-                SelfHp = player.Hp,
+                SelfHp = self.Hp,
                 TargetHp = target.Hp,
                 BattleTime = DateTime.Now
             };
-            if (player.Hp <= 0)
+            if (self.Hp <= 0)
             {
-                this.DeletePlayer(player);
+                this.DeletePlayer(self);
                 return battleResult;
             }
             if (target.Hp <= 0)
             {
-                int exp = _lootHelper.GetLootExp(player, target);
+                int exp = _lootHelper.GetLootExp(self, target);
+                int rankScore = _lootHelper.GetLootRankScore(self, target);
                 var equipment = _lootHelper.GetLootEquipment(target);
-                player.AddExp(exp);
-                player.AddEquipment(equipment);
+                self.AddExp(exp);
+                self.Rank += rankScore;
+                self.AddEquipment(equipment);
                 battleResult.LootExp = exp;
+                battleResult.LootRankScore += rankScore;
                 battleResult.LootExpEquipment = equipment;
                 this.DeletePlayer(target);
             }
@@ -217,7 +232,7 @@ namespace CshsClubGame.Models
 
         private TurnRecord ProcessEquipmentCard(string selfId, EquipmentCard? equipmentCard)
         {
-            var player = this.GetPlayer(selfId);
+            var player = this.GetPlayerById(selfId);
             this.ValidateEquipmentTurn(player, equipmentCard);
 
             var equip = equipmentCard!.ConvertToEquipment();
@@ -251,7 +266,7 @@ namespace CshsClubGame.Models
 
         private TurnRecord ProcessEventCard(string selfId, EventCard? eventCard)
         {
-            var player = this.GetPlayer(selfId);
+            var player = this.GetPlayerById(selfId);
             this.ValidateEventTurn(player, eventCard);
             player!.Rest(eventCard!);
             player!.SurvivedDay += 1;

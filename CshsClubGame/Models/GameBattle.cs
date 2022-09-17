@@ -12,6 +12,7 @@
         public int SelfHp { get; set; }
         public int TargetHp { get; set; }
         public int LootExp { get; set; }
+        public int LootRankScore { get; set; }
         public Equipment? LootExpEquipment { get; set; }
         public DateTime BattleTime { get; set; }
     }

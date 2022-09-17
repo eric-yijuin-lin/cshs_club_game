@@ -26,7 +26,7 @@ namespace CshsClubGame.Controllers
             for (int i = 0; i < d; i++)
             {
                 var dummyPlayer = _gameManager.CreateDebugPlayer(i);
-                _gameManager.JoinRoom(room.Id, dummyPlayer);
+                _gameManager.JoinRoom(GameManager.LOBBY_ID, dummyPlayer);
             }
             return Ok();
         }
@@ -49,7 +49,7 @@ namespace CshsClubGame.Controllers
         [HttpPost("JoinRoom")]
         public ActionResult JoinRoom([FromHeader] string selfId, string roomId)
         {
-            var player = _gameManager.GetPlayer(selfId);
+            var player = _gameManager.GetPlayerById(selfId);
             if (player == null)
             {
                 return BadRequest("無效的 Player ID");
@@ -67,13 +67,13 @@ namespace CshsClubGame.Controllers
         [HttpPost("GetCards")]
         public ActionResult GetCards([FromHeader] string selfId)
         {
-            var player = _gameManager.GetPlayer(selfId);
+            var player = _gameManager.GetPlayerById(selfId);
             if (player == null)
             {
                 return BadRequest("無效的玩家 ID");
             }
 
-            var cards = _gameManager.GetTurnCards(selfId);
+            var cards = _gameManager.GetTurnCard(selfId);
             // 先寫效能差的髒扣，以後再改
             var result = new List<object>();
             foreach (var card in cards)
@@ -94,7 +94,7 @@ namespace CshsClubGame.Controllers
             var record = _gameManager.ProcessTurnCard(selfId, card);
             if (record != null)
             {
-                return Ok(card);
+                return Ok(record);
             }
             return BadRequest("未定義的卡片類型");
         }

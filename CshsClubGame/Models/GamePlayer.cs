@@ -11,7 +11,8 @@
         public int Hp { get; set; }
         public int Atk { get; set; }
         public int Rank { get; set; }
-        public int SurvivedDay { get; set; }
+        public int SurvivedDay { get; set; } = 1;
+        public bool IsNpc { get; }
         public bool HasEquipment { get { return EquipmentList.Any(); } }
         public List<Equipment> EquipmentList = new List<Equipment>();
 
@@ -20,6 +21,7 @@
         public Player(string classUnit, string seatNo, string name)
         {
             Id = Guid.NewGuid().ToString();
+            IsNpc = false;
             ClassUnit = classUnit;
             SeatNo = seatNo;
             Name = name;
@@ -27,7 +29,21 @@
             Hp = 10;
             Atk = 5;
             Rank = 0;
-            this.EquipmentList = new List<Equipment>();
+            EquipmentList = new List<Equipment>();
+        }
+
+        public Player(CharaterCard card)
+        {
+            Id = "";
+            IsNpc = true;
+            ClassUnit = "訓練場";
+            SeatNo = "999";
+            Name = card.Title;
+            Level = card.Level;
+            Hp = card.Hp;
+            Atk = card.Atk;
+            Rank = 0;
+            EquipmentList = new List<Equipment>();
         }
 
         public void AddEquipment(Equipment? equipment)

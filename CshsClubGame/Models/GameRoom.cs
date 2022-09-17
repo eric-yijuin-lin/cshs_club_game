@@ -44,13 +44,17 @@
             return _players.ContainsKey(playerId);
         }
 
-        public bool IsPlayersInSameRoom(Player player1, Player player2)
+        public bool IsPlayersInSameRoom(Player self, Player target)
         {
-            if (string.IsNullOrEmpty(player1.RoomId))
+            if (string.IsNullOrEmpty(self.RoomId))
             {
                 return false;
             }
-            if (player1.RoomId != player2.RoomId)
+            if (target.IsNpc)
+            {
+                return true;
+            }
+            if (self.RoomId != target.RoomId)
             {
                 return false;
             }

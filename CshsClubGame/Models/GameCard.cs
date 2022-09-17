@@ -10,8 +10,8 @@
             "角色",
             "角色",
             "角色",
-            "角色",
-            "角色", // 角色 (戰鬥) 卡 80%
+            "角色", // 角色 (戰鬥) 卡 70%
+            "NPC", // NPC (戰鬥) 卡 10%
             "裝備", // 裝備卡 10%
             "事件", // 事件 (休息) 卡 10%
         };
@@ -105,6 +105,11 @@
                         var opponent = this.GetOpponentCard(playerId, candidates);
                         cards.Add(opponent);
                         break;
+                    case "NPC":
+                        int npcLevel = rand.Next(4);
+                        var npc = CharaterCard.NewNpcCard(npcLevel);
+                        cards.Add(npc);
+                        break;
                     case "裝備":
                         var equipment = this.GetEquipmentCard();
                         cards.Add(equipment);
@@ -160,6 +165,7 @@
             {
                 Id = "npc",
                 CardType = "角色",
+                Level = level,
                 Hp = 5,
                 Rank = 0,
                 Atk = 1,
@@ -172,12 +178,14 @@
                 case 1:
                     return npc;
                 case 2:
+                    npc.Level = 2;
                     npc.Atk = 2;
                     npc.Description = "456 木頭人";
                     npc.Quality = "精良";
                     npc.Title = "菁英木人";
                     return npc;
                 case 3:
+                    npc.Level = 3;
                     npc.Atk = 3;
                     npc.Description = "789 木頭人";
                     npc.Quality = "史詩";
