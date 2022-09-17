@@ -40,9 +40,9 @@ namespace CshsClubGame.Controllers
         }
 
         [HttpPost("CreatePlayer")]
-        public Player CreatePlayer(string classUnit, string seatNo, string name)
+        public Player CreatePlayer(string classUnit, string name)
         {
-            var player = _gameManager.CreatePlayer(classUnit, seatNo, name);
+            var player = _gameManager.CreatePlayer(classUnit, name);
             return player;
         }
 

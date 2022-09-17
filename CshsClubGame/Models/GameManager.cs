@@ -28,9 +28,9 @@ namespace CshsClubGame.Models
             return room;
         }
 
-        public Player CreatePlayer(string classUnit, string seatNo, string name)
+        public Player CreatePlayer(string classUnit, string name)
         {
-            var player = new Player(classUnit, seatNo, name);
+            var player = new Player(classUnit, name);
             _players[player.Id] = player;
             return player;
         }
@@ -45,7 +45,7 @@ namespace CshsClubGame.Models
 
         public Player CreateDebugPlayer(int index)
         {
-            var player = new Player("debug", index.ToString().PadLeft(2, '0'), $"debugger-{index}");
+            var player = new Player("debug", $"debugger-{index}");
             player.Id = "p" + index;
             _players[player.Id] = player;
             return player;

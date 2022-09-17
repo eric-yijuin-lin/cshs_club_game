@@ -5,8 +5,8 @@
         public string Id { get; set; }
         public string RoomId { get; set; } = null!;
         public string ClassUnit { get; set; }
-        public string SeatNo { get; set; }
         public string Name { get; set; }
+        public int ImageId { get; set; }
         public int Level { get; set; }
         public int Hp { get; set; }
         public int Atk { get; set; }
@@ -14,17 +14,16 @@
         public int SurvivedDay { get; set; } = 1;
         public bool IsNpc { get; }
         public bool HasEquipment { get { return EquipmentList.Any(); } }
-        public List<Equipment> EquipmentList = new List<Equipment>();
+        public int Exp { get; private set; }
+        public List<Equipment> EquipmentList { get; set; } = new List<Equipment>();
 
-        private int Exp { get; set; }
-
-        public Player(string classUnit, string seatNo, string name)
+        public Player(string classUnit, string name)
         {
             Id = Guid.NewGuid().ToString();
             IsNpc = false;
             ClassUnit = classUnit;
-            SeatNo = seatNo;
             Name = name;
+            ImageId = new Random().Next(1, 9);
             Level = 1;
             Hp = 10;
             Atk = 5;
@@ -37,8 +36,8 @@
             Id = "";
             IsNpc = true;
             ClassUnit = "訓練場";
-            SeatNo = "999";
             Name = card.Title;
+            ImageId = 0;
             Level = card.Level;
             Hp = card.Hp;
             Atk = card.Atk;
