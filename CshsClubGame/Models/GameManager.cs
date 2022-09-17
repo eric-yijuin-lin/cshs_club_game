@@ -5,6 +5,7 @@ namespace CshsClubGame.Models
 {
     public class GameManager
     {
+        private const string LOBBY_ID = "e6553cf38154794e9a4fb7e3162b9f83"; // MD5 of "publicLobby" 
         private readonly Dictionary<string, Player> _players;
         private readonly Dictionary<string, GameRoom> _rooms;
         private readonly LootHelper _lootHelper;
@@ -14,6 +15,7 @@ namespace CshsClubGame.Models
         {
             _players = new Dictionary<string, Player>();
             _rooms = new Dictionary<string, GameRoom>();
+            _rooms.Add(LOBBY_ID, new GameRoom(LOBBY_ID, "大廳", 100));
             _lootHelper = lootHelper;
             _cardHelper = cardHelper;
         }
@@ -64,7 +66,8 @@ namespace CshsClubGame.Models
 
         public GameRoom? JoinRoom(string roomId, Player player)
         {
-            var room = _rooms[roomId];
+            //var room = _rooms[roomId];
+            var room = _rooms[LOBBY_ID]; // 暫時改成只能加大廳
             if (room.IsPlayerInRoom(player.Id))
             {
                 return room;

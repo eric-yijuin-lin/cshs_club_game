@@ -8,10 +8,10 @@
         public int MaxPlayerCount { get; }
         public int CurrentPlayerCount { get { return _players.Count; } }
 
-        public GameRoom(string unitCode, string roomName, int maxPlayer)
+        public GameRoom(string roomId, string roomName, int maxPlayer)
         {
             _players = new Dictionary<string, Player>();
-            this.Id = unitCode;
+            this.Id = roomId;
             this.Name = roomName;
             this.MaxPlayerCount = maxPlayer;
         }
