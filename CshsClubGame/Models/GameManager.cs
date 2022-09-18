@@ -10,14 +10,16 @@ namespace CshsClubGame.Models
         private readonly Dictionary<string, GameRoom> _rooms;
         private readonly LootHelper _lootHelper;
         private readonly CardHelper _cardHelper;
+        private readonly GameHistoryHelper _historyHelper;
 
-        public GameManager(LootHelper lootHelper, CardHelper cardHelper)
+        public GameManager(LootHelper lootHelper, CardHelper cardHelper, GameHistoryHelper historyHelper)
         {
             _players = new Dictionary<string, Player>();
             _rooms = new Dictionary<string, GameRoom>();
             _rooms.Add(LOBBY_ID, new GameRoom(LOBBY_ID, "大廳", 100));
             _lootHelper = lootHelper;
             _cardHelper = cardHelper;
+            _historyHelper = historyHelper;
         }
 
         public GameRoom CreateRoom(string roomName, int maxPlayer)
@@ -77,6 +79,7 @@ namespace CshsClubGame.Models
             if (room.AddPlayer(player))
             {
                 player.RoomId = roomId;
+                _historyHelper.AddJoinRoomHistory(player);
                 return room;
             };
             return null;
@@ -111,21 +114,27 @@ namespace CshsClubGame.Models
                 PropertyNameCaseInsensitive = true
             };
 
+            TurnRecord turnRecord = null;
             string? cardType = card["cardType"]?.GetValue<string>();
             switch (cardType)
             {
                 case "角色":
                     var charaterCard = card.Deserialize<CharaterCard>(options);
-                    return this.ProcessBattleCard(selfId, charaterCard);
+                    turnRecord = this.ProcessBattleCard(selfId, charaterCard);
+                    break;
                 case "裝備":
                     var equipmentCard = card.Deserialize<EquipmentCard>(options);
-                    return this.ProcessEquipmentCard(selfId, equipmentCard);
+                    turnRecord = this.ProcessEquipmentCard(selfId, equipmentCard);
+                    break;
                 case "事件":
                     var eventCard = card.Deserialize<EventCard>(options);
-                    return this.ProcessEventCard(selfId, eventCard);
+                    turnRecord = this.ProcessEventCard(selfId, eventCard);
+                    break;
                 default:
                     return null;
             }
+
+            return turnRecord;
         }
 
         private void DeletePlayer(Player player)
@@ -158,20 +167,21 @@ namespace CshsClubGame.Models
                 throw new InvalidDataException("找不到玩家的房間");
             }
 
-            Player? self = this.GetPlayerById(selfId);
+            Player? me = this.GetPlayerById(selfId);
             Player? target = this.GetPlayerByCard(charaterCard);
-            string validateResult = this.ValidateBattle(roomId, self, target);
+            string validateResult = this.ValidateBattle(roomId, me, target);
             if (validateResult != "OK")
             {
                 throw new InvalidDataException(validateResult);
             }
+            var battleRecord = this.ProcessBattle(me!, target!);
+            me!.SurvivedDay += 1;
 
-            var battleRecord = this.ProcessBattle(self, target);
-            self.SurvivedDay += 1;
+            _historyHelper.AddBattleHistory(me!, target!, battleRecord);
             return new TurnRecord()
             {
                 BattleRecord = battleRecord,
-                SelfStatus = self,
+                SelfStatus = me,
                 TurnType = "角色"
             };
         }
@@ -238,6 +248,8 @@ namespace CshsClubGame.Models
             var equip = equipmentCard!.ConvertToEquipment();
             player!.AddEquipment(equip);
             player!.SurvivedDay += 1;
+
+            _historyHelper.AddEquipHistory(player, equip);
             return new TurnRecord()
             {
                 BattleRecord = null,
@@ -266,14 +278,16 @@ namespace CshsClubGame.Models
 
         private TurnRecord ProcessEventCard(string selfId, EventCard? eventCard)
         {
-            var player = this.GetPlayerById(selfId);
-            this.ValidateEventTurn(player, eventCard);
-            player!.Rest(eventCard!);
-            player!.SurvivedDay += 1;
+            var me = this.GetPlayerById(selfId);
+            this.ValidateEventTurn(me, eventCard);
+            me!.Rest(eventCard!);
+            me!.SurvivedDay += 1;
+
+            _historyHelper.AddEventHistory(me, eventCard!);
             return new TurnRecord()
             {
                 BattleRecord = null,
-                SelfStatus = player,
+                SelfStatus = me,
                 TurnType = "事件"
             };
         }

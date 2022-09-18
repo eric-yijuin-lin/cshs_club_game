@@ -92,7 +92,7 @@
 
     public class Equipment
     {
-        public string Quality { get; set; }
+        public string Quality { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public int EnhancedHp { get; set; }
         public int EnhancedAtk { get; set; }

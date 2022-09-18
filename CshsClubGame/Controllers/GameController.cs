@@ -1,5 +1,6 @@
 using CshsClubGame.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -60,6 +61,7 @@ namespace CshsClubGame.Controllers
             {
                 return BadRequest("加入房間失敗");
             }
+
             return Ok(room);
         }
 
@@ -92,11 +94,11 @@ namespace CshsClubGame.Controllers
         public ActionResult SelectCard([FromHeader] string selfId, JsonObject card)
         {
             var record = _gameManager.ProcessTurnCard(selfId, card);
-            if (record != null)
+            if (record == null)
             {
-                return Ok(record);
+                return BadRequest("未定義的卡片類型");
             }
-            return BadRequest("未定義的卡片類型");
+            return Ok(record);
         }
     }
 }

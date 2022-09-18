@@ -21,6 +21,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<LootHelper>();
 builder.Services.AddSingleton<GameManager>();
 builder.Services.AddSingleton<CardHelper>();
+builder.Services.AddSingleton<GameHistoryHelper>();
 
 var app = builder.Build();
 
