@@ -19,6 +19,9 @@
         <div id="loadingDiv">
             <p class="h1">載入中...</p>
         </div>
+
+
+        <!-- 建立新玩家 -->
         <div class="row" style="display: none" id="createPlayerDiv">
             <div class="col-md-6 col-12">
                 <div class="row">
@@ -52,21 +55,21 @@
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
-                        <img src="./assets/img/rpg-pixel.gif" alt="">
+                        <img src="assets/img/rpg-pixel.gif" alt="">
                     </div>
                 </div>
             </div>
         </div>
+
+
+        <!-- 最上方 container：玩家資訊與卡牌 -->
         <div class="row" style="display: none" id="playerInfoDiv">
+            <!-- 玩家資訊 -->
             <div class="col-md-6 col-12">
                 <div class="row">
                     <div class="col-md-6 col-12">
                         <h3>角色資訊</h3>
                         <ul id="playerInfoList" class="list-group">
-                            <li class="list-group-item">Dapibus ac facilisis in</li>
-                            <li class="list-group-item">Morbi leo risus</li>
-                            <li class="list-group-item">Porta ac consectetur ac</li>
-                            <li class="list-group-item">Vestibulum at eros</li>
                         </ul>
                     </div>
                     <div class="col-md-6 col-12">
@@ -74,8 +77,53 @@
                     </div>
                 </div>
             </div>
+            <!-- 候選卡牌 -->
+            <div class="col-md-6 col-12" style="display: none;" id="turnCardsDiv">
+                <table id="turnCardsTable" class="table">
+                    <thead>
+                        <tr>
+                            <td><p class="h5">可選卡牌</p></td>
+                            <td><p class="h5">卡牌預覽</p></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="card-0">card1</td>
+                            <td rowspan="5">
+                                <div class="card" style="width: 100%;">
+                                    <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
+                                    <img class="card-img-top" id="cardImage" style="max-width: 100px;" src="assets/img/unkonwman.jpg" alt="卡牌圖片">
+                                    <h4 class="card-title" id="cardTitle"></h4>
+                                    <div class="card-body">
+                                      <p class="card-text" id="cardDescription"></p>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                      <li class="list-group-item" id="cardAtk"></li>
+                                      <li class="list-group-item" id="cardHp"></li>
+                                      <li class="list-group-item" id="cardSpecial"></li>
+                                    </ul>
+                                  </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="card-1">card2</td>
+                        </tr>
+                        <tr>
+                            <td id="card-2">card3</td>
+                        </tr>
+                        <tr>
+                            <td id="card-3">card4</td>
+                        </tr>
+                        <tr>
+                            <td id="card-4">card5</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+
 
 
     <!-- Bootstrap -->
@@ -128,7 +176,7 @@
         }
 
         function updatePlayerInfo(player) {
-            $("#playerImg").attr("src", `./assets/img/${player.imageId}.jpg`)
+            $("#playerImg").attr("src", `assets/img/${player.imageId}.jpg`)
             const listElement = $("#playerInfoList");
             listElement.empty();
             listElement.append(`
@@ -148,12 +196,63 @@
                 method: 'POST',
                 headers: { "selfId": playerId },
                 success: function (cards) {
-                    console.log(cards)
+                    console.log("imherer", cards);
+                    setAvailableCards(cards);
+                    setCardPreview(cards, 0);
+                    $("#turnCardsDiv").show();
                 },
                 error: function(err) {
                     alert('ajax err:', err);
                 }
             })
+        }
+
+        function setAvailableCards(cards) {
+            const cardsTable = $("#turnCardsTable").find('tbody');
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                const cardTd = $(`#card-${i}`);
+                cardTd.html(`[${card.cardType}]  ${card.title}`);
+            }
+        }
+
+        function setCardPreview(cards, index) {
+            const card = cards[index];
+            setCommonPreview(card);
+            switch (card.cardType) {
+                case "角色":
+                    setCharaterPreview(card);
+                    break;
+                case "裝備":
+                    setEquipmentPreview(card);
+                    break;
+                case "事件":
+                    setEventPreview(card);
+                    break;
+                default:
+                    console.log("error: 無法辨識的卡片類型");
+                    break;
+            }
+        }
+
+        function setCommonPreview(card) {
+            $("#cardTitle").html(card.title);
+            $("#cardDescription").html(card.description);
+        }
+        function setCharaterPreview(card) {
+            $("#cardAtk").html(`攻擊力：${card.atk}`);
+            $("#cardHp").html(`生命力：${card.hp}`);
+            $("#cardSpecial").html(`裝備：${JSON.stringify(card.equipments.map(x => x.name))}`);
+        }
+        function setEquipmentPreview(card) {
+            $("#cardAtk").html(`增加攻擊力：${card.enhancedAtk}`);
+            $("#cardHp").html(`增加生命力：${card.enhancedHp}`);
+            $("#cardSpecial").html("特殊效果：無");
+        }
+        function setEventPreview(card) {
+            $("#cardAtk").html(`增加攻擊力：0`);
+            $("#cardHp").html(`增加攻擊力：0`);
+            $("#cardSpecial").html(`特殊效果：恢復生命力 ${card.amount} 點`);
         }
     </script>
     <!-- Templatemo -->
