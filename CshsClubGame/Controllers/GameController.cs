@@ -91,14 +91,21 @@ namespace CshsClubGame.Controllers
         }
 
         [HttpPost("SelectCard")]
-        public ActionResult SelectCard([FromHeader] string selfId, JsonObject card)
+        public ActionResult SelectCard([FromForm] SelectCardRequest request)
         {
-            var record = _gameManager.ProcessTurnCard(selfId, card);
+            var card = JsonObject.Parse(request.CardJson)!.AsObject();
+            var record = _gameManager.ProcessTurnCard(request.SelfId, card);
             if (record == null)
             {
                 return BadRequest("未定義的卡片類型");
             }
             return Ok(record);
+        }
+
+        public class SelectCardRequest
+        {
+            public string SelfId { get; set; }
+            public string CardJson { get; set; }
         }
     }
 }
