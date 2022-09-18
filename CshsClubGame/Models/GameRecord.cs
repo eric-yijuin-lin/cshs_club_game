@@ -74,6 +74,7 @@ namespace CshsClubGame.Models
         public string ClassUnit { get; set; } = null!;
         public string PlayerName { get; set; } = null!;
         public string Message { get; set; } = null!;
+        public string DateTimeString { get { return EntryDateTime.ToString("HH:mm:ss"); } }
 
         public GameHistoryEntry(Player player, string message)
         {

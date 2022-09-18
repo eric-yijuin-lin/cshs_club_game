@@ -127,6 +127,12 @@
                 </table>
             </div>
         </div>
+
+
+        <!-- 歷史紀錄 -->
+        <div class="row" style="display: none;" id="historyDiv">
+            <h3 id="historyHeader">歷史紀錄</h3>
+        </div>
     </div>
 
 
@@ -144,6 +150,7 @@
         let playerId = "";
         let availableCards = [];
         let selectedCard = {};
+        const postedHistorySerialNo = [0];
 
         $(window).load(function() {
             $("#loadingDiv").hide();
@@ -166,6 +173,7 @@
                     updatePlayerInfo(player);
                     $("#createPlayerDiv").hide();
                     $("#playerInfoDiv").show();
+                    $("#historyDiv").show();
                     $.ajax({
                         url: `${apiUrl}/Game/JoinRoom?roomId=restricted`,
                         headers: { "selfId": playerId },
@@ -292,6 +300,7 @@
                 success: function (turnResult) {
                     console.log(turnResult)
                     updatePlayerInfo(turnResult.selfStatus);
+                    queryNewRecords();
                     if (turnResult.selfStatus.hp <= 0) {
                         if (confirm("你的角色掛了，是否重新開始?")) {
                             location.reload();
@@ -307,7 +316,22 @@
         }
 
         function queryNewRecords() {
-
+            $.ajax({
+                url: `${apiUrl}/Game/PullHistory`,
+                method: 'GET',
+                success: function (history) {
+                    const historyHeader = $("#historyHeader");
+                    for (const entry of history) {
+                        if (entry.serialNo > postedHistorySerialNo[0]) {
+                            historyHeader.after(`<p>[${entry.dateTimeString}]  ${entry.message}</p>`)
+                            postedHistorySerialNo.unshift(entry.serialNo)
+                        }
+                    }
+                },
+                error: function(err) {
+                    alert('ajax err:', err);
+                }
+            });
         }
 
     </script>
