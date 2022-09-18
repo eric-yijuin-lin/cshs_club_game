@@ -68,7 +68,7 @@
             return new EquipmentCard()
             {
                 CardType = "裝備",
-                Description = "一個稀世的珍寶",
+                Description = equip.Description,
                 EnhancedAtk = equip.EnhancedAtk,
                 EnhancedHp = equip.EnhancedHp,
                 Quality = equip.Quality,
