@@ -269,8 +269,7 @@ namespace CshsClubGame.Models
                 throw new InvalidDataException("驗證裝備卡失敗：裝備不可為空");
             }
             if (string.IsNullOrEmpty(equipmentCard.Title)
-                || equipmentCard.EnhancedHp == 0 
-                || equipmentCard.EnhancedAtk == 0)
+                || (equipmentCard.EnhancedHp == 0 && equipmentCard.EnhancedAtk == 0))
             {
                 throw new InvalidDataException("驗證裝備卡失敗：無效的裝備屬性");
             }
