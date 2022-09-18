@@ -68,7 +68,7 @@
             <div class="col-md-6 col-12">
                 <div class="row">
                     <div class="col-md-6 col-12">
-                        <h3>角色資訊</h3>
+                        <h3>主角資訊</h3>
                         <ul id="playerInfoList" class="list-group">
                         </ul>
                     </div>
@@ -80,17 +80,17 @@
             <!-- 候選卡牌 -->
             <div class="col-md-6 col-12" style="display: none;" id="turnCardsDiv">
                 <table id="turnCardsTable" class="table">
-                    <thead>
+                    <thead style="width: 100%;">
                         <tr>
-                            <td><p class="h5">可選卡牌</p></td>
+                            <td style="width: 50%;"><p class="h5">可選卡牌</p></td>
                             <td><p class="h5">卡牌預覽</p></td>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td id="card-0">card1</td>
-                            <td rowspan="5">
-                                <div class="card" style="width: 100%;">
+                            <td id="card-0" onclick="setSelectedCard(0)">card1</td>
+                            <td rowspan="6">
+                                <div class="card">
                                     <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
                                     <img class="card-img-top" id="cardImage" style="max-width: 100px;" src="assets/img/unkonwman.jpg" alt="卡牌圖片">
                                     <h4 class="card-title" id="cardTitle"></h4>
@@ -106,16 +106,22 @@
                             </td>
                         </tr>
                         <tr>
-                            <td id="card-1">card2</td>
+                            <td id="card-1" onclick="setSelectedCard(1)">card2</td>
                         </tr>
                         <tr>
-                            <td id="card-2">card3</td>
+                            <td id="card-2" onclick="setSelectedCard(2)">card3</td>
                         </tr>
                         <tr>
-                            <td id="card-3">card4</td>
+                            <td id="card-3" onclick="setSelectedCard(3)">card4</td>
                         </tr>
                         <tr>
-                            <td id="card-4">card5</td>
+                            <td id="card-4" onclick="setSelectedCard(4)">card5</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button class="btn btn-primary" id="selectCardBtn" onclick="submitCard()">
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -136,6 +142,8 @@
     <script>
         const apiUrl = "https://localhost:7062";
         let playerId = "";
+        let availableCards = [];
+        let selectedCard = {};
 
         $(window).load(function() {
             $("#loadingDiv").hide();
@@ -183,8 +191,8 @@
                 <li class="list-group-item">暱稱：${player.name}</li>
                 <li class="list-group-item">班級：${player.classUnit}</li>
                 <li class="list-group-item">等級：${player.level}</li>
-                <li class="list-group-item">經驗值：${player.exp}</li>
                 <li class="list-group-item">攻擊力：${player.atk}</li>
+                <li class="list-group-item">生命力：${player.hp}</li>
                 <li class="list-group-item">PVP分數：${player.rank}</li>
                 <li class="list-group-item">裝備：${JSON.stringify(player.equipmentList.map(x => x.name))}</li>
             `);
@@ -196,24 +204,30 @@
                 method: 'POST',
                 headers: { "selfId": playerId },
                 success: function (cards) {
-                    console.log("imherer", cards);
-                    setAvailableCards(cards);
-                    setCardPreview(cards, 0);
+                    // console.log("imherer", cards);
+                    availableCards = cards;
+                    setCardList(cards);
+                    setSelectedCard(0);
                     $("#turnCardsDiv").show();
                 },
                 error: function(err) {
                     alert('ajax err:', err);
                 }
-            })
+            });
         }
 
-        function setAvailableCards(cards) {
+        function setCardList(cards) {
             const cardsTable = $("#turnCardsTable").find('tbody');
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
                 const cardTd = $(`#card-${i}`);
                 cardTd.html(`[${card.cardType}]  ${card.title}`);
             }
+        }
+
+        function setSelectedCard(index) {
+            selectedCard = availableCards[index];
+            setCardPreview(availableCards, index);
         }
 
         function setCardPreview(cards, index) {
@@ -230,7 +244,7 @@
                     setEventPreview(card);
                     break;
                 default:
-                    console.log("error: 無法辨識的卡片類型");
+                    alert("error: 無法辨識的卡片類型");
                     break;
             }
         }
@@ -240,20 +254,54 @@
             $("#cardDescription").html(card.description);
         }
         function setCharaterPreview(card) {
+            if (card.id !== "npc") {
+                $("#cardImage").attr("src", "assets/img/unknownman.jpg")
+            } else {
+                $("#cardImage").attr("src", "assets/img/woodman.jpg")
+            }
             $("#cardAtk").html(`攻擊力：${card.atk}`);
             $("#cardHp").html(`生命力：${card.hp}`);
             $("#cardSpecial").html(`裝備：${JSON.stringify(card.equipments.map(x => x.name))}`);
+            $("#selectCardBtn").text("發動攻擊");
         }
         function setEquipmentPreview(card) {
+            $("#cardImage").attr("src", "assets/img/equipment.png")
             $("#cardAtk").html(`增加攻擊力：${card.enhancedAtk}`);
             $("#cardHp").html(`增加生命力：${card.enhancedHp}`);
             $("#cardSpecial").html("特殊效果：無");
+            $("#selectCardBtn").text("穿裝備");
         }
         function setEventPreview(card) {
+            $("#cardImage").attr("src", "assets/img/question.png")
             $("#cardAtk").html(`增加攻擊力：0`);
             $("#cardHp").html(`增加攻擊力：0`);
             $("#cardSpecial").html(`特殊效果：恢復生命力 ${card.amount} 點`);
+            $("#selectCardBtn").text("發動事件");
         }
+
+        function submitCard() {
+            console.log(selectedCard,"FUCK")
+            $.ajax({
+                url: `${apiUrl}/Game/SelectCard`,
+                method: 'POST',
+                data: {
+                    "selfId": playerId,
+                    "cardJson": JSON.stringify(selectedCard)
+                },
+                success: function (turnResult) {
+                    console.log(turnResult)
+                    updatePlayerInfo(turnResult.selfStatus);
+                },
+                error: function(err) {
+                    alert('ajax err:', err);
+                }
+            });
+        }
+
+        function queryNewRecords() {
+
+        }
+
     </script>
     <!-- Templatemo -->
     <script src="assets/js/templatemo.js"></script>
