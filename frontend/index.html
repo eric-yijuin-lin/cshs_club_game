@@ -280,10 +280,11 @@
         }
 
         function submitCard() {
-            console.log(selectedCard,"FUCK")
             $.ajax({
                 url: `${apiUrl}/Game/SelectCard`,
                 method: 'POST',
+                // 超雷：api 是 full host name 的時候 jQuery 竟然會自己把 ContentType 從
+                // application/json 換成 application/x-www-form-urlencoded
                 data: {
                     "selfId": playerId,
                     "cardJson": JSON.stringify(selectedCard)
@@ -291,6 +292,13 @@
                 success: function (turnResult) {
                     console.log(turnResult)
                     updatePlayerInfo(turnResult.selfStatus);
+                    if (turnResult.selfStatus.hp <= 0) {
+                        if (confirm("你的角色掛了，是否重新開始?")) {
+                            location.reload();
+                        }
+                        return;
+                    }
+                    getTurnCards();
                 },
                 error: function(err) {
                     alert('ajax err:', err);
