@@ -65,7 +65,12 @@
 
         public void Rest(EventCard eventCard)
         {
+            int maxHp = this.ComputeMaxHp();
             this.Hp += eventCard.Amount;
+            if (this.Hp > maxHp)
+            {
+                this.Hp = maxHp;
+            }
         }
 
         private void ConsumeExp()
@@ -74,9 +79,22 @@
             {
                 this.Exp -= LevelInfo.ExpMap[this.Level].LevelUpExp;
                 this.Level += 1;
-                this.Atk = StrengthInfo.StrengthMap[this.Level].Atk;
-                this.Hp = StrengthInfo.StrengthMap[this.Level].Hp;
+                this.Atk = this.ComputeMaxAtk();
+                this.Hp = this.ComputeMaxHp();
             }
+        }
+        private int ComputeMaxAtk()
+        {
+            int levelAtk = StrengthInfo.StrengthMap[this.Level].Atk;
+            int equipAtk = this.EquipmentList.Sum(x => x.EnhancedAtk);
+            return levelAtk + equipAtk;
+        }
+
+        private int ComputeMaxHp()
+        {
+            int levelHp = StrengthInfo.StrengthMap[this.Level].Hp;
+            int equipHp = this.EquipmentList.Sum(x => x.EnhancedHp);
+            return levelHp + equipHp;
         }
     }
     public class LevelInfo
