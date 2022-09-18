@@ -137,6 +137,11 @@ namespace CshsClubGame.Models
             return turnRecord;
         }
 
+        public GameHistoryEntry[] GetHistoryPage()
+        {
+            return _historyHelper.GetHistoryPage(DateTime.Now);
+        }
+
         private void DeletePlayer(Player player)
         {
             _players.Remove(player.Id);

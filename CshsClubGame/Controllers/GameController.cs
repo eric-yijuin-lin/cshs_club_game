@@ -102,6 +102,12 @@ namespace CshsClubGame.Controllers
             return Ok(record);
         }
 
+        [HttpGet("PullHistory")]
+        public GameHistoryEntry[] GetGameHistoryByNow()
+        {
+            return _gameManager.GetHistoryPage();
+        }
+
         public class SelectCardRequest
         {
             public string SelfId { get; set; }

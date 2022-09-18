@@ -4,6 +4,7 @@ namespace CshsClubGame.Models
 {
     public class GameHistoryHelper
     {
+        private static long _serialNo = 0;
         private readonly ConcurrentDictionary<DateTime, ConcurrentBag<GameHistoryEntry>> _history;
         private readonly ConcurrentDictionary<DateTime, long> _maxPageSerialNo;
 
@@ -48,7 +49,7 @@ namespace CshsClubGame.Models
         {
             entry.EntryDateTime = DateTime.Now;
             var timeMark = GameHistoryHelper.RoundUp(entry.EntryDateTime, TimeSpan.FromMinutes(1));
-            entry.SerialNo = this.GetNextSerialNoFromPage(timeMark);
+            entry.SerialNo = ++GameHistoryHelper._serialNo;
 
             if (_history.ContainsKey(timeMark))
             {
@@ -63,24 +64,6 @@ namespace CshsClubGame.Models
         private static DateTime RoundUp(DateTime dt, TimeSpan span)
         {
             return new DateTime((dt.Ticks + span.Ticks - 1) / span.Ticks * span.Ticks, dt.Kind);
-        }
-
-        private long GetNextSerialNoFromPage(DateTime timeMark)
-        {
-            this.IncreasePageSerialNo(timeMark);
-            return _maxPageSerialNo[timeMark];
-        }
-
-        private void IncreasePageSerialNo(DateTime timeMark)
-        {
-            if (_maxPageSerialNo.ContainsKey(timeMark))
-            {
-                _maxPageSerialNo[timeMark] += 1;
-            }
-            else
-            {
-                _maxPageSerialNo[timeMark] = 1;
-            }    
         }
     }
 
