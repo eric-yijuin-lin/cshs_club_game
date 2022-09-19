@@ -146,7 +146,11 @@
     <script src="assets/js/isotope.pkgd.js"></script>
     <!-- Page Script -->
     <script>
-        const apiUrl = "https://localhost:7062";
+        const CARD_TYPE_CHARACTER = "char";
+        const CARD_TYPE_EQUIP = "equip";
+        const CARD_TYPE_EVENT = "event";
+        const apiUrl = "https://localhost:7062/api";
+        // const apiUrl = "https://goattl.com/ClubGame/api";
         let playerId = "";
         let availableCards = [];
         let selectedCard = {};
@@ -242,13 +246,13 @@
             const card = cards[index];
             setCommonPreview(card);
             switch (card.cardType) {
-                case "角色":
+                case CARD_TYPE_CHARACTER:
                     setCharaterPreview(card);
                     break;
-                case "裝備":
+                case CARD_TYPE_EQUIP:
                     setEquipmentPreview(card);
                     break;
-                case "事件":
+                case CARD_TYPE_EVENT:
                     setEventPreview(card);
                     break;
                 default:

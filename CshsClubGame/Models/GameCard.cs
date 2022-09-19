@@ -2,18 +2,22 @@
 {
     public class CardHelper
     {
+        public const string CARD_TYPE_CHARACTER = "char";
+        public const string CARD_TYPE_NPC = "npc";
+        public const string CARD_TYPE_EQUIP = "equip";
+        public const string CARD_TYPE_EVENT = "event";
         private static readonly string[] _turnProbabilities =
         {
-            "角色",
-            "角色",
-            "角色",
-            "角色",
-            "角色",
-            "角色",
-            "角色", // 角色 (戰鬥) 卡 70%
-            "NPC", // NPC (戰鬥) 卡 10%
-            "裝備", // 裝備卡 10%
-            "事件", // 事件 (休息) 卡 10%
+            CARD_TYPE_CHARACTER,
+            CARD_TYPE_CHARACTER,
+            CARD_TYPE_CHARACTER,
+            CARD_TYPE_CHARACTER,
+            CARD_TYPE_CHARACTER,
+            CARD_TYPE_CHARACTER,
+            CARD_TYPE_CHARACTER, // 角色 (戰鬥) 卡 70%
+            CARD_TYPE_NPC, // NPC (戰鬥) 卡 10%
+            CARD_TYPE_EQUIP, // 裝備卡 10%
+            CARD_TYPE_EVENT, // 事件 (休息) 卡 10%
         };
 
         private List<Player> GetOpponentCandidates(string playerId, Dictionary<string, Player> allPlayers)
@@ -46,13 +50,13 @@
             {
                 Id = opponent.Id,
                 Atk = opponent.Atk,
-                CardType = "角色",
+                CardType = CARD_TYPE_CHARACTER,
                 Description = $"一個來自 {opponent.ClassUnit} 的冒險者",
                 Equipments = opponent
                             .EquipmentList
                             .Select(x => x.Name).ToList(),
                 Level = opponent.Level,
-                Quality = "史詩",
+                Quality = "epic",
                 Rank = opponent.Rank,
                 Title = opponent.Name,
                 Hp = opponent.Hp
@@ -66,7 +70,7 @@
             var equip = LootHelper.GetRandomEquipment();
             return new EquipmentCard()
             {
-                CardType = "裝備",
+                CardType = CARD_TYPE_EQUIP,
                 Description = equip.Description,
                 EnhancedAtk = equip.EnhancedAtk,
                 EnhancedHp = equip.EnhancedHp,
@@ -79,11 +83,11 @@
         {
             return new EventCard()
             {
-                CardType = "事件",
+                CardType = CARD_TYPE_EVENT,
                 Description = "研究顯示，睡覺有益身心健康",
                 Amount = 20,
                 EventId = "休息",
-                Quality = "普通",
+                Quality = "normal",
                 Title = "休息"
             };
         }
@@ -97,22 +101,22 @@
             {
                 int index = rand.Next(0, _turnProbabilities.Length);
                 string cardType = _turnProbabilities[index];
-
+                Console.WriteLine($"cardType {i}：{cardType}"); 
                 switch (cardType)
                 {
-                    case "角色":
+                    case CARD_TYPE_CHARACTER:
                         var opponent = this.GetOpponentCard(playerId, candidates);
                         cards.Add(opponent);
                         break;
-                    case "NPC":
+                    case CARD_TYPE_NPC:
                         var npc = CharaterCard.NewNpcCard();
                         cards.Add(npc);
                         break;
-                    case "裝備":
+                    case CARD_TYPE_EQUIP:
                         var equipment = this.GetEquipmentCard();
                         cards.Add(equipment);
                         break;
-                    case "事件":
+                    case CARD_TYPE_EVENT:
                         var eventCard = this.GetEventCard();
                         cards.Add(eventCard);
                         break;
@@ -120,6 +124,7 @@
                         throw new InvalidDataException("無效的卡片類型");
                 }
             }
+            Console.WriteLine("return cards; " + cards.Count);
             return cards;
         }
     }
@@ -178,7 +183,7 @@
             var npc = new CharaterCard()
             {
                 Id = "npc",
-                CardType = "角色",
+                CardType = CardHelper.CARD_TYPE_CHARACTER,
                 Level = level,
                 Hp = 5,
                 Rank = 0,

@@ -53,13 +53,13 @@ namespace CshsClubGame.Controllers
             var player = _gameManager.GetPlayerById(selfId);
             if (player == null)
             {
-                return BadRequest("µL®Äªº Player ID");
+                return BadRequest("ï¿½Lï¿½Äªï¿½ Player ID");
             }
 
             var room = _gameManager.JoinRoom(roomId, player);
             if(room == null)
             {
-                return BadRequest("¥[¤J©Ğ¶¡¥¢±Ñ");
+                return BadRequest("ï¿½[ï¿½Jï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½");
             }
 
             return Ok(room);
@@ -72,21 +72,32 @@ namespace CshsClubGame.Controllers
             var player = _gameManager.GetPlayerById(selfId);
             if (player == null)
             {
-                return BadRequest("µL®Äªºª±®a ID");
+                return BadRequest("ï¿½Lï¿½Äªï¿½ï¿½ï¿½ï¿½a ID");
             }
 
             var cards = _gameManager.GetTurnCard(selfId);
-            // ¥ı¼g®Ä¯à®tªºÅ¼¦©¡A¥H«á¦A§ï
+            Console.WriteLine("cards.Count" + cards.Count);
+            // å…ˆå¯«æ•ˆèƒ½å·®çš„é«’æ‰£ï¼Œä»¥å¾Œå†æ”¹
             var result = new List<object>();
             foreach (var card in cards)
             {
-                if (card.CardType == "¨¤¦â")
+                if (card.CardType == CardHelper.CARD_TYPE_CHARACTER)
+                {
+                    Console.WriteLine(card.CardType);
                     result.Add((CharaterCard)card);
-                else if (card.CardType == "¸Ë³Æ")
+                }
+                else if (card.CardType == CardHelper.CARD_TYPE_EQUIP)
+                {
+                    Console.WriteLine(card.CardType);
                     result.Add((EquipmentCard)card);
-                else if (card.CardType == "¨Æ¥ó")
+                }
+                else if (card.CardType == CardHelper.CARD_TYPE_EVENT)
+                {
+                    Console.WriteLine(card.CardType);
                     result.Add((EventCard)card);
+                }
             }
+            Console.WriteLine("result.Count" + result.Count);
             return Ok(result);
         }
 
@@ -97,7 +108,7 @@ namespace CshsClubGame.Controllers
             var record = _gameManager.ProcessTurnCard(request.SelfId, card);
             if (record == null)
             {
-                return BadRequest("¥¼©w¸qªº¥d¤ùÃş«¬");
+                return BadRequest("ï¿½ï¿½ï¿½wï¿½qï¿½ï¿½ï¿½dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             }
             return Ok(record);
         }
