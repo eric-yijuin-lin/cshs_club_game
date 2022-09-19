@@ -149,12 +149,20 @@
         const CARD_TYPE_CHARACTER = "char";
         const CARD_TYPE_EQUIP = "equip";
         const CARD_TYPE_EVENT = "event";
-        const apiUrl = "https://localhost:7062/api";
-        // const apiUrl = "https://goattl.com/ClubGame/api";
+        // const apiUrl = "https://localhost:7062/api";
+        const apiUrl = "https://goattl.com/ClubGame/api";
         let playerId = "";
         let availableCards = [];
         let selectedCard = {};
         const postedHistorySerialNo = [0];
+        const translateDict = {
+            "char": "角色", 
+            "equip": "裝備", 
+            "event": "事件", 
+            "normal": "角色", 
+            "advanced": "精良", 
+            "epic": "史詩", 
+        }
 
         $(window).load(function() {
             $("#loadingDiv").hide();
@@ -233,7 +241,8 @@
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
                 const cardTd = $(`#card-${i}`);
-                cardTd.html(`[${card.cardType}]  ${card.title}`);
+                const cardTypeCht = translateDict[card.cardType];
+                cardTd.html(`[${cardTypeCht}]  ${card.title}`);
             }
         }
 

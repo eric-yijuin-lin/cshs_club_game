@@ -126,15 +126,15 @@ namespace CshsClubGame.Models
             string? cardType = card["cardType"]?.GetValue<string>();
             switch (cardType)
             {
-                case "角色":
+                case CardHelper.CARD_TYPE_CHARACTER:
                     var charaterCard = card.Deserialize<CharaterCard>(options);
                     turnRecord = this.ProcessBattleCard(selfId, charaterCard);
                     break;
-                case "裝備":
+                case CardHelper.CARD_TYPE_EQUIP:
                     var equipmentCard = card.Deserialize<EquipmentCard>(options);
                     turnRecord = this.ProcessEquipmentCard(selfId, equipmentCard);
                     break;
-                case "事件":
+                case CardHelper.CARD_TYPE_EVENT:
                     var eventCard = card.Deserialize<EventCard>(options);
                     turnRecord = this.ProcessEventCard(selfId, eventCard);
                     break;
@@ -195,7 +195,7 @@ namespace CshsClubGame.Models
             {
                 BattleRecord = battleRecord,
                 SelfStatus = me,
-                TurnType = "角色"
+                TurnType = CardHelper.CARD_TYPE_CHARACTER
             };
         }
 
