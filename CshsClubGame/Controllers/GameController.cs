@@ -53,13 +53,13 @@ namespace CshsClubGame.Controllers
             var player = _gameManager.GetPlayerById(selfId);
             if (player == null)
             {
-                return BadRequest("�L�Ī� Player ID");
+                return BadRequest("無效的玩家 Player ID");
             }
 
             var room = _gameManager.JoinRoom(roomId, player);
             if(room == null)
             {
-                return BadRequest("�[�J�ж�����");
+                return BadRequest("加入房間失敗");
             }
 
             return Ok(room);
@@ -72,7 +72,7 @@ namespace CshsClubGame.Controllers
             var player = _gameManager.GetPlayerById(selfId);
             if (player == null)
             {
-                return BadRequest("�L�Ī����a ID");
+                return BadRequest("無效的玩家 ID");
             }
 
             var cards = _gameManager.GetTurnCard(selfId);
@@ -108,7 +108,7 @@ namespace CshsClubGame.Controllers
             var record = _gameManager.ProcessTurnCard(request.SelfId, card);
             if (record == null)
             {
-                return BadRequest("���w�q���d������");
+                return BadRequest("未定義的卡片類型");
             }
             return Ok(record);
         }
