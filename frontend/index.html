@@ -155,13 +155,12 @@
         let availableCards = [];
         let selectedCard = {};
         const postedHistorySerialNo = [0];
-        const translateDict = {
-            "char": "角色", 
-            "equip": "裝備", 
-            "event": "事件", 
-            "normal": "角色", 
-            "advanced": "精良", 
-            "epic": "史詩", 
+        const cardTypeMap = {
+            0: "未定義",
+            1: "角色", 
+            2: "NPC", 
+            3: "裝備", 
+            4: "事件", 
         }
 
         $(window).load(function() {
@@ -241,7 +240,7 @@
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
                 const cardTd = $(`#card-${i}`);
-                const cardTypeCht = translateDict[card.cardType];
+                const cardTypeCht = cardTypeMap[card.cardType];
                 cardTd.html(`[${cardTypeCht}]  ${card.title}`);
             }
         }
@@ -255,13 +254,13 @@
             const card = cards[index];
             setCommonPreview(card);
             switch (card.cardType) {
-                case CARD_TYPE_CHARACTER:
+                case 1: // 角色
                     setCharaterPreview(card);
                     break;
-                case CARD_TYPE_EQUIP:
+                case 3: // 裝備
                     setEquipmentPreview(card);
                     break;
-                case CARD_TYPE_EVENT:
+                case 4: // 事件
                     setEventPreview(card);
                     break;
                 default:
@@ -282,7 +281,7 @@
             }
             $("#cardAtk").html(`攻擊力：${card.atk}`);
             $("#cardHp").html(`生命力：${card.hp}`);
-            $("#cardSpecial").html(`裝備：${JSON.stringify(card.equipments.map(x => x.name))}`);
+            $("#cardSpecial").html(`裝備：${JSON.stringify(card.equipments)}`);
             $("#selectCardBtn").text("發動攻擊");
         }
         function setEquipmentPreview(card) {

@@ -81,17 +81,17 @@ namespace CshsClubGame.Controllers
             var result = new List<object>();
             foreach (var card in cards)
             {
-                if (card.CardType == CardHelper.CARD_TYPE_CHARACTER)
+                if (card.CardType == CardType.Character)
                 {
                     Console.WriteLine(card.CardType);
                     result.Add((CharaterCard)card);
                 }
-                else if (card.CardType == CardHelper.CARD_TYPE_EQUIP)
+                else if (card.CardType == CardType.Equipment)
                 {
                     Console.WriteLine(card.CardType);
                     result.Add((EquipmentCard)card);
                 }
-                else if (card.CardType == CardHelper.CARD_TYPE_EVENT)
+                else if (card.CardType == CardType.Event)
                 {
                     Console.WriteLine(card.CardType);
                     result.Add((EventCard)card);

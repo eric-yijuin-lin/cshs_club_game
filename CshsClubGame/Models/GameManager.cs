@@ -123,18 +123,18 @@ namespace CshsClubGame.Models
             };
 
             TurnRecord turnRecord = null;
-            string? cardType = card["cardType"]?.GetValue<string>();
+            CardType cardType = (CardType)card["cardType"]!.GetValue<int>();
             switch (cardType)
             {
-                case CardHelper.CARD_TYPE_CHARACTER:
+                case CardType.Character:
                     var charaterCard = card.Deserialize<CharaterCard>(options);
                     turnRecord = this.ProcessBattleCard(selfId, charaterCard);
                     break;
-                case CardHelper.CARD_TYPE_EQUIP:
+                case CardType.Equipment:
                     var equipmentCard = card.Deserialize<EquipmentCard>(options);
                     turnRecord = this.ProcessEquipmentCard(selfId, equipmentCard);
                     break;
-                case CardHelper.CARD_TYPE_EVENT:
+                case CardType.Event:
                     var eventCard = card.Deserialize<EventCard>(options);
                     turnRecord = this.ProcessEventCard(selfId, eventCard);
                     break;
@@ -195,7 +195,7 @@ namespace CshsClubGame.Models
             {
                 BattleRecord = battleRecord,
                 SelfStatus = me,
-                TurnType = CardHelper.CARD_TYPE_CHARACTER
+                TurnType = CardType.Character
             };
         }
 
@@ -267,7 +267,7 @@ namespace CshsClubGame.Models
             {
                 BattleRecord = null,
                 SelfStatus = player,
-                TurnType = "裝備"
+                TurnType = CardType.Equipment
             };
         }
 
@@ -300,7 +300,7 @@ namespace CshsClubGame.Models
             {
                 BattleRecord = null,
                 SelfStatus = me,
-                TurnType = "事件"
+                TurnType = CardType.Event
             };
         }
 

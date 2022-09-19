@@ -140,7 +140,7 @@ namespace CshsClubGame.Models
 
     public class TurnRecord
     {
-        public string TurnType { get; set; } = null!;
+        public CardType TurnType { get; set; } = CardType.Undefined;
         public Player SelfStatus { get; set; } = null!;
         public BattleRecord? BattleRecord { get; set; }
     }

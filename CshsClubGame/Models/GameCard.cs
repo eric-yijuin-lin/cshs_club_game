@@ -2,22 +2,18 @@
 {
     public class CardHelper
     {
-        public const string CARD_TYPE_CHARACTER = "char";
-        public const string CARD_TYPE_NPC = "npc";
-        public const string CARD_TYPE_EQUIP = "equip";
-        public const string CARD_TYPE_EVENT = "event";
-        private static readonly string[] _turnProbabilities =
+        private static readonly CardType[] _turnProbabilities =
         {
-            CARD_TYPE_CHARACTER,
-            CARD_TYPE_CHARACTER,
-            CARD_TYPE_CHARACTER,
-            CARD_TYPE_CHARACTER,
-            CARD_TYPE_CHARACTER,
-            CARD_TYPE_CHARACTER,
-            CARD_TYPE_CHARACTER, // 角色 (戰鬥) 卡 70%
-            CARD_TYPE_NPC, // NPC (戰鬥) 卡 10%
-            CARD_TYPE_EQUIP, // 裝備卡 10%
-            CARD_TYPE_EVENT, // 事件 (休息) 卡 10%
+            CardType.Character,
+            CardType.Character,
+            CardType.Character,
+            CardType.Character,
+            CardType.Character,
+            CardType.Character,
+            CardType.Character, // 角色 (戰鬥) 卡 70%
+            CardType.Npc, // NPC (戰鬥) 卡 10%
+            CardType.Equipment, // 裝備卡 10%
+            CardType.Event, // 事件 (休息) 卡 10%
         };
 
         private List<Player> GetOpponentCandidates(string playerId, Dictionary<string, Player> allPlayers)
@@ -50,7 +46,7 @@
             {
                 Id = opponent.Id,
                 Atk = opponent.Atk,
-                CardType = CARD_TYPE_CHARACTER,
+                CardType = CardType.Character,
                 Description = $"一個來自 {opponent.ClassUnit} 的冒險者",
                 Equipments = opponent
                             .EquipmentList
@@ -70,7 +66,7 @@
             var equip = LootHelper.GetRandomEquipment();
             return new EquipmentCard()
             {
-                CardType = CARD_TYPE_EQUIP,
+                CardType = CardType.Equipment,
                 Description = equip.Description,
                 EnhancedAtk = equip.EnhancedAtk,
                 EnhancedHp = equip.EnhancedHp,
@@ -83,7 +79,7 @@
         {
             return new EventCard()
             {
-                CardType = CARD_TYPE_EVENT,
+                CardType = CardType.Event,
                 Description = "研究顯示，睡覺有益身心健康",
                 Amount = 20,
                 EventId = "休息",
@@ -100,23 +96,23 @@
             for (int i = 0; i < 5; i++)
             {
                 int index = rand.Next(0, _turnProbabilities.Length);
-                string cardType = _turnProbabilities[index];
+                CardType cardType = _turnProbabilities[index];
                 Console.WriteLine($"cardType {i}：{cardType}"); 
                 switch (cardType)
                 {
-                    case CARD_TYPE_CHARACTER:
+                    case CardType.Character:
                         var opponent = this.GetOpponentCard(playerId, candidates);
                         cards.Add(opponent);
                         break;
-                    case CARD_TYPE_NPC:
+                    case CardType.Npc: // NPC should be refactor to Character Type later
                         var npc = CharaterCard.NewNpcCard();
                         cards.Add(npc);
                         break;
-                    case CARD_TYPE_EQUIP:
+                    case CardType.Equipment:
                         var equipment = this.GetEquipmentCard();
                         cards.Add(equipment);
                         break;
-                    case CARD_TYPE_EVENT:
+                    case CardType.Event:
                         var eventCard = this.GetEventCard();
                         cards.Add(eventCard);
                         break;
@@ -130,7 +126,7 @@
     }
     public abstract class GameCard
     {
-        public string CardType { get; set; } = null!;
+        public CardType CardType { get; set; } = CardType.Undefined;
         public string Quality { get; set; } = null!;
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
@@ -183,7 +179,7 @@
             var npc = new CharaterCard()
             {
                 Id = "npc",
-                CardType = CardHelper.CARD_TYPE_CHARACTER,
+                CardType = CardType.Character,
                 Level = level,
                 Hp = 5,
                 Rank = 0,
@@ -219,5 +215,14 @@
     {
         public string EventId { get; set; } = null!;
         public int Amount { get; set; }
+    }
+
+    public enum CardType
+    {
+        Undefined,
+        Character,
+        Npc,
+        Equipment,
+        Event
     }
 }
