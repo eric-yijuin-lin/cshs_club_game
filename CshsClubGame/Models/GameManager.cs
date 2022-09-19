@@ -22,6 +22,14 @@ namespace CshsClubGame.Models
             _historyHelper = historyHelper;
         }
 
+        public void Rest()
+        {
+            _rooms.Clear();
+            _players.Clear();
+            _historyHelper.ClearHistory();
+            _rooms.Add(LOBBY_ID, new GameRoom(LOBBY_ID, "大廳", 100));
+        }
+
         public GameRoom CreateRoom(string roomName, int maxPlayer)
         {
             var guid = Guid.NewGuid().ToString();

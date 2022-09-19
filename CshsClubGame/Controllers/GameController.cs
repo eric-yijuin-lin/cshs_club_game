@@ -108,6 +108,16 @@ namespace CshsClubGame.Controllers
             return _gameManager.GetHistoryPage();
         }
 
+        [HttpGet("Reset/{token}")]
+        public ActionResult Reset(string token)
+        {
+            if (token == "12345")
+            {
+                _gameManager.Rest();
+            }
+            return Ok();
+        }
+
         public class SelectCardRequest
         {
             public string SelfId { get; set; }

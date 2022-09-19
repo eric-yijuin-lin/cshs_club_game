@@ -44,6 +44,11 @@ namespace CshsClubGame.Models
             var entry = GameHistoryEntry.CreateEventHistoryEntry(me, eventCard);
             this.AddHistory(entry);
         }
+        public void ClearHistory()
+        {
+            _serialNo = 0;
+            _history.Clear();
+        }
 
         private void AddHistory(GameHistoryEntry entry)
         {
@@ -128,7 +133,7 @@ namespace CshsClubGame.Models
 
         public static GameHistoryEntry CreateEventHistoryEntry(Player player, EventCard eventCard)
         {
-            string message = $"{player.ClassUnit} 的 {player.Name} 覺得上課很無料，趴在桌上呼呼大睡，恢復了 {eventCard.Amount} 點生命力！";
+            string message = $"{player.ClassUnit} 的 {player.Name} 覺得上課很無聊，趴在桌上呼呼大睡，恢復了 {eventCard.Amount} 點生命力！";
             return new GameHistoryEntry(player, message);
         }
     }
