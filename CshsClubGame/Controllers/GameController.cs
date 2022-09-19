@@ -7,7 +7,7 @@ using System.Text.Json.Nodes;
 namespace CshsClubGame.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class GameController : ControllerBase
     {
         private readonly GameManager _gameManager;
@@ -29,7 +29,7 @@ namespace CshsClubGame.Controllers
                 var dummyPlayer = _gameManager.CreateDebugPlayer(i);
                 _gameManager.JoinRoom(GameManager.LOBBY_ID, dummyPlayer);
             }
-            return Ok();
+            return Ok("");
         }
 #endif
 
