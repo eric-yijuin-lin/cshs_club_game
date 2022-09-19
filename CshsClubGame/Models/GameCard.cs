@@ -37,8 +37,7 @@
             var rand = new Random();
             if (oppoentCandidates.Count == 0)
             {
-                int npcLevel = rand.Next(1, 4);
-                return CharaterCard.NewNpcCard(npcLevel);
+                return CharaterCard.NewNpcCard();
             }
 
             int index = rand.Next(rand.Next(0, oppoentCandidates.Count));
@@ -106,8 +105,7 @@
                         cards.Add(opponent);
                         break;
                     case "NPC":
-                        int npcLevel = rand.Next(4);
-                        var npc = CharaterCard.NewNpcCard(npcLevel);
+                        var npc = CharaterCard.NewNpcCard();
                         cards.Add(npc);
                         break;
                     case "裝備":
@@ -159,8 +157,24 @@
         public int Atk { get; set; }
         public int Hp { get; set; }
 
-        public static CharaterCard NewNpcCard(int level)
+        public static CharaterCard NewNpcCard(int level = 0)
         {
+            if (level == 0)
+            {
+                int rand = new Random().Next(10);
+                if (rand < 6)
+                {
+                    level = 1;
+                }
+                else if (rand < 8)
+                {
+                    level = 2;
+                }
+                else
+                {
+                    level = 3;
+                }
+            }
             var npc = new CharaterCard()
             {
                 Id = "npc",
