@@ -322,7 +322,9 @@
                     getTurnCards();
                 },
                 error: function(err) {
-                    alert('ajax err:', err);
+                    if(confirm('你在發動攻擊前被暗算了，是否要重新開始?')){
+                        location.reload();
+                    }
                 }
             });
         }
