@@ -149,8 +149,8 @@
         const CARD_TYPE_CHARACTER = "char";
         const CARD_TYPE_EQUIP = "equip";
         const CARD_TYPE_EVENT = "event";
-        // const apiUrl = "https://localhost:7062/api";
-        const apiUrl = "https://goattl.com/ClubGame/api";
+        const apiUrl = "https://localhost:7062/api";
+        // const apiUrl = "https://goattl.com/ClubGame/api";
         let playerId = "";
         let availableCards = [];
         let selectedCard = {};
@@ -161,6 +161,11 @@
             2: "NPC", 
             3: "裝備", 
             4: "事件", 
+        }
+        const qualityMap = {
+            0: "normal",
+            1: "advanced",
+            2: "epic",
         }
 
         $(window).load(function() {
@@ -240,9 +245,16 @@
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i];
                 const cardTd = $(`#card-${i}`);
-                const cardTypeCht = cardTypeMap[card.cardType];
-                cardTd.html(`[${cardTypeCht}]  ${card.title}`);
+                const cardTitle = getCardTitleHtml(card)
+                cardTd.html(cardTitle);
             }
+        }
+
+        function getCardTitleHtml(card) {
+            const cardTypeCht = cardTypeMap[card.cardType];
+            const qualityClass = `quality-${qualityMap[card.quality]}`;
+            const qualitySpan = `<span class="${qualityClass}">[${cardTypeCht}]</span>`
+            return `${qualitySpan} ${card.title}`
         }
 
         function setSelectedCard(index) {
@@ -323,7 +335,7 @@
                 success: function (turnResult) {
                     console.log(turnResult)
                     updatePlayerInfo(turnResult.selfStatus);
-                    queryNewRecords();
+                    pullHistory();
                     if (turnResult.selfStatus.hp <= 0) {
                         if (confirm("你的角色掛了，是否重新開始?")) {
                             location.reload();
@@ -340,11 +352,23 @@
             });
         }
 
-        function queryNewRecords() {
+        function pullHistory() {
             $.ajax({
                 url: `${apiUrl}/Game/PullHistory`,
                 method: 'GET',
                 success: function (history) {
+                    history.sort(
+                        function(a, b){
+                            if ( a.serialNo < b.serialNo ){
+                                return -1;
+                            }
+                            if ( a.serialNo > b.serialNo ){
+                                return 1;
+                            }
+                            return 0;
+                        }
+                    );
+                    console.log("sorted history:", history);
                     const historyHeader = $("#historyHeader");
                     for (const entry of history) {
                         if (entry.serialNo > postedHistorySerialNo[0]) {
