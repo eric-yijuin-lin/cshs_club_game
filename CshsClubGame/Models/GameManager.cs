@@ -232,12 +232,8 @@ namespace CshsClubGame.Models
                 TargetHp = target.Hp,
                 BattleTime = DateTime.Now
             };
-            if (self.Hp <= 0)
-            {
-                this.DeletePlayer(self);
-                return battleResult;
-            }
-            if (target.Hp <= 0)
+            
+            if (self.Hp > 0 && target.Hp <= 0)
             {
                 int exp = _lootHelper.GetLootExp(self, target);
                 int rankScore = _lootHelper.GetLootRankScore(self, target);
@@ -248,6 +244,13 @@ namespace CshsClubGame.Models
                 battleResult.LootExp = exp;
                 battleResult.LootRankScore += rankScore;
                 battleResult.LootExpEquipment = equipment;
+            }
+            if (self.Hp <= 0)
+            {
+                this.DeletePlayer(self);
+            }
+            if (target.Hp <= 0)
+            {
                 this.DeletePlayer(target);
             }
             return battleResult;
