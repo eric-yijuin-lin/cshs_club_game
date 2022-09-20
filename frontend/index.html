@@ -247,7 +247,18 @@
 
         function setSelectedCard(index) {
             selectedCard = availableCards[index];
+            setSelectedBorder(index);
             setCardPreview(availableCards, index);
+        }
+
+        function setSelectedBorder(selectedIndex) {
+            for (let i = 0; i < 5; i++) {
+                if (i !== selectedIndex) {
+                    $(`#card-${i}`).removeClass("selected-card");         
+                } else {
+                    $(`#card-${i}`).addClass("selected-card")
+                }
+            }
         }
 
         function setCardPreview(cards, index) {

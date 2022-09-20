@@ -65,6 +65,10 @@ https://templatemo.com/tm-561-purple-buzz
     width: 90%!important;
 }
 
+.selected-card {
+    border: 3px solid rgb(245, 72, 81);
+}
+
 @media screen and (max-width: 1024px) {
     .diffculty-star {
         font-size: medium;
