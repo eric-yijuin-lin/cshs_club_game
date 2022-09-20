@@ -52,7 +52,7 @@
                             .EquipmentList
                             .Select(x => x.Name).ToList(),
                 Level = opponent.Level,
-                Quality = "epic",
+                Quality = ItemQuality.Normal,
                 Rank = opponent.Rank,
                 Title = opponent.Name,
                 Hp = opponent.Hp
@@ -83,7 +83,7 @@
                 Description = "研究顯示，睡覺有益身心健康",
                 Amount = 20,
                 EventId = "休息",
-                Quality = "normal",
+                Quality = ItemQuality.Normal,
                 Title = "休息"
             };
         }
@@ -127,7 +127,7 @@
     public abstract class GameCard
     {
         public CardType CardType { get; set; } = CardType.Undefined;
-        public string Quality { get; set; } = null!;
+        public ItemQuality Quality { get; set; }
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
     }
@@ -185,7 +185,7 @@
                 Rank = 0,
                 Atk = 1,
                 Description = "123 木頭人",
-                Quality = "普通",
+                Quality = ItemQuality.Normal,
                 Title = "訓練場木人"
             };
             switch (level)
@@ -196,14 +196,14 @@
                     npc.Level = 2;
                     npc.Atk = 2;
                     npc.Description = "456 木頭人";
-                    npc.Quality = "精良";
+                    npc.Quality = ItemQuality.Advanced;
                     npc.Title = "菁英木人";
                     return npc;
                 case 3:
                     npc.Level = 3;
                     npc.Atk = 3;
                     npc.Description = "789 木頭人";
-                    npc.Quality = "史詩";
+                    npc.Quality = ItemQuality.Epic;
                     npc.Title = "傳說木人";
                     return npc;
                 default:
@@ -224,5 +224,12 @@
         Npc,
         Equipment,
         Event
+    }
+
+    public enum ItemQuality
+    {
+        Normal,
+        Advanced,
+        Epic
     }
 }

@@ -147,7 +147,8 @@ namespace CshsClubGame.Models
 
         public GameHistoryEntry[] GetHistoryPage()
         {
-            return _historyHelper.GetHistoryPage(DateTime.Now);
+            var historyPage = _historyHelper.GetHistoryPage(DateTime.Now);
+            return historyPage;
         }
 
         private void DeletePlayer(Player player)
