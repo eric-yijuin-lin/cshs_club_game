@@ -27,8 +27,8 @@
             new Equipment() { Quality = "精良", Name = "老師的課本", EnhancedAtk = 20, EnhancedHp = 0, Description = "雖然輕薄又小本，但卻能對學生造成極大的傷害" },
             new Equipment() { Quality = "精良", Name = "騎士鎧甲", EnhancedAtk = 0, EnhancedHp = 25, Description = "學校倉庫翻出來的古老盔甲，不曉得如何穿越道現代的" },
             new Equipment() { Quality = "精良", Name = "法師之杖", EnhancedAtk = 25, EnhancedHp = 0, Description = "據說單身 30 年就可以學會火球術，這把魔障應該是 30 歲以上的人所製作" },
-            new Equipment() { Quality = "史詩", Name = "美國隊長盾牌", EnhancedAtk = 25, EnhancedHp = 40, Description = "攝影棚偷拿出來的盾牌，沒想到堅固無比，還內建遙控飛行功能" },
-            new Equipment() { Quality = "史詩", Name = "索爾的槌子", EnhancedAtk = 40, EnhancedHp = 0, Description = "攝影棚偷出來的槌子，沒想到一點都不重，手握上去還會有被電到的感覺" },
+            new Equipment() { Quality = "史詩", Name = "美國隊長盾牌", EnhancedAtk = 0, EnhancedHp = 40, Description = "攝影棚偷拿出來的盾牌，沒想到堅固無比，還內建遙控飛行功能" },
+            new Equipment() { Quality = "史詩", Name = "索爾的槌子", EnhancedAtk = 40, EnhancedHp = 0, Description = "攝影棚偷出來的槌子，品質似乎有點問題，會漏電" },
         };
 
         public static Equipment GetRandomEquipment()
