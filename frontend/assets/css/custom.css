@@ -82,6 +82,11 @@ https://templatemo.com/tm-561-purple-buzz
     color: rgb(177, 3, 230);
 }
 
+.nickname-dice {
+    max-width: 100%;
+    cursor: pointer;
+}
+
 @media screen and (max-width: 1024px) {
     .diffculty-star {
         font-size: medium;

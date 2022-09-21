@@ -32,23 +32,32 @@
                                 <label for="classUnit">請選擇班級</label>
                             </div>
                             <div class="mb-2">
-                                <select id="classUnitInput" class="form-select" required>
-                                    <option value="" selected disabled>點我下拉</option>
-                                    <option value="美二1">美二1</option>
-                                    <option value="高二1">高二1</option>
-                                    <option value="高二2">高二2</option>
-                                    <option value="高二3">高二3</option>
-                                    <option value="高二4">高二4</option>
-                                    <option value="高二5">高二5</option>
-                                </select>
+                                <div class="col-8">
+                                    <select id="classUnitInput" class="form-select" required>
+                                        <option value="" selected disabled>點我下拉</option>
+                                        <option value="美二1">美二1</option>
+                                        <option value="高一1">高二1</option>
+                                        <option value="高一2">高二2</option>
+                                        <option value="高一3">高二3</option>
+                                        <option value="高二3">高二4</option>
+                                        <option value="向日葵班">向日葵班</option>
+                                        <option value="玫瑰班">玫瑰班</option>
+                                    </select>
+                                </div>
                             </div>
 
                             
                             <div class="">
                                 <label for="name">請輸入暱稱</label>
                             </div>
-                            <div class="mb-2">
-                                <input id="nameInput" type="text" class="form-control" required>
+                            <div class="row mb-2">
+                                <div class="col-8">
+                                    <input id="nameInput" type="text" class="form-control" required>
+                                </div>
+                                <div class="col-4">
+                                    <img class="nickname-dice" onclick="rollNicknameDice()" src="./assets/img/dice.jpg" alt="骰子.jpg">
+                                    <span id="diceCountSpan"></span>
+                                </div>
                             </div>
 
                             <button class="btn btn-primary" onclick="createPlayer()">創建</button>
@@ -154,6 +163,7 @@
         let playerId = "";
         let availableCards = [];
         let selectedCard = {};
+        let diceCount = 5;
         const postedHistorySerialNo = [0];
         const cardTypeMap = {
             0: "未定義",
@@ -167,11 +177,29 @@
             1: "advanced",
             2: "epic",
         }
+        const nicknamePrefix = ["樂觀的","開心的","憤怒的","悲傷的","熱情的","冷酷的","多愁善感的","認真的","努力的","懶散的","壓力大的","旋轉的","喝醉的","愛睏的","公園的","電梯裡的","水井裡的","櫥櫃裡的","水嫩的","乾癟的","熬夜中的","曬傷的","冷凍的","燒焦的","躺平的","陽光的","陰險的","聖潔的","邪惡的","還在賴床的","生鏽的",]
+        const nicknameSurfix = ["仙人掌","榴槤","香蕉","芭樂","大西瓜","坦克車","手榴彈","咖啡杯","工程師","老師","小學生","國中生","高中生","阿伯","阿嬤","叔叔","阿姨","大媽","大嬸","課本","立可白","橡皮擦","iPhone 8","iPad","豆干","豆皮","貢丸","棉花糖","泡芙","倚天劍","屠龍刀",]
 
         $(window).load(function() {
             $("#loadingDiv").hide();
             $("#createPlayerDiv").show();
+            $("#diceCountSpan").html(`x${diceCount}`);
         });
+
+        function rollNicknameDice() {
+            console.log(1)
+            if (diceCount > 0) {
+                console.log(2)
+                const prefixIndex = Math.floor(Math.random() * nicknamePrefix.length);
+                const surfixIndex = Math.floor(Math.random() * nicknameSurfix.length);
+                const nickname = nicknamePrefix[prefixIndex] + nicknameSurfix[surfixIndex];
+                $("#nameInput").val(nickname)
+                diceCount--;
+                $("#diceCountSpan").html(`x${diceCount}`);
+            } else {
+                alert("骰子用完了");
+            }
+        }
 
         function createPlayer(){
             const classUnit = $("#classUnitInput").val();
