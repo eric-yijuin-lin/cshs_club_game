@@ -175,6 +175,7 @@ namespace CshsClubGame.Models
     {
         NotProceeded,
         Ok,
+        Interrupted,
         Error
     }
 }

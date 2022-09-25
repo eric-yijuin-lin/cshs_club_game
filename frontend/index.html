@@ -365,6 +365,9 @@
                     if (turnResult.status === 0) { // not proceeded
                         handleNoProceededTurn(turnResult);
                     }
+                    else if (turnResult.status === 2) { // intterupted
+                        handleIntterupted(turnResult);
+                    }
                     else if (turnResult.status === 1) {
                         switch (turnResult.turnType) {
                             case 1:
@@ -384,9 +387,7 @@
                     }
                 },
                 error: function(err) {
-                    if(confirm('你在發動攻擊前被暗算了，是否要重新開始?')){
-                        location.reload();
-                    }
+                    alert(`unexcepted error: ${err}`);
                 }
             });
         }
@@ -395,6 +396,11 @@
             alert(turnResult.message + ".  即將重新抽排");
             pullHistory();
             getTurnCards();
+            return;
+        }
+        function handleIntterupted(turnResult) {
+            alert(turnResult.message);
+            location.reload();
             return;
         }
         function handleBattleResult(turnResult) {

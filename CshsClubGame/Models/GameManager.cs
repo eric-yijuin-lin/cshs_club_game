@@ -196,6 +196,13 @@ namespace CshsClubGame.Models
             }
 
             Player me = this.GetPlayerById(selfId);
+            if (me.Status != PlayerStatus.Alive)// 先硬幹，之後再重構
+            {
+                turnRecord.Status = TurnStatus.Interrupted;
+                turnRecord.Message = "你在發動攻擊前被暗算了";
+                return turnRecord;
+            }
+
             Player? target = this.GetPlayerByCard(charaterCard);
             validateResult = this.ValidateBattle(me, target);
             if (validateResult != "OK")
