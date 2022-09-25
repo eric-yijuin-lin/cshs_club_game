@@ -363,20 +363,25 @@
                 success: function (turnResult) {
                     console.log(turnResult)
                     if (turnResult.status === 0) { // not proceeded
-                        alert(turnResult.message + ".  即將重新抽排");
-                        pullHistory();
-                        getTurnCards();
-                        return;
+                        handleNoProceededTurn(turnResult);
                     }
-                    updatePlayerInfo(turnResult.playerMe);
-                    pullHistory();
-                    if (turnResult.playerMe.hp <= 0) {
-                        if (confirm("你的角色掛了，是否重新開始?")) {
-                            location.reload();
+                    else if (turnResult.status === 1) {
+                        switch (turnResult.turnType) {
+                            case 1:
+                                handleBattleResult(turnResult);
+                                return;
+                            case 2:
+                                handlDefault(turnResult);
+                                return;
+                            case 3:
+                                handlDefault(turnResult);
+                                return;
+                            default:
+                                alert("error: invalid turn type: ", turnResult.turnType);
                         }
-                        return;
+                    } else {
+                        alert("An error occured while processing the turn: ", turnResult.message)
                     }
-                    getTurnCards();
                 },
                 error: function(err) {
                     if(confirm('你在發動攻擊前被暗算了，是否要重新開始?')){
@@ -384,6 +389,35 @@
                     }
                 }
             });
+        }
+
+        function handleNoProceededTurn(turnResult) {
+            alert(turnResult.message + ".  即將重新抽排");
+            pullHistory();
+            getTurnCards();
+            return;
+        }
+        function handleBattleResult(turnResult) {
+            const battleStatus = turnResult.battleRecord.status;
+            switch (battleStatus) {
+                case 1: // me win
+                    handlDefault(turnResult);
+                    return;
+                case 2: // target win
+                    alert("你的角色掛了！按下確定重新開始。");
+                    location.reload();
+                    return;
+                case 3: // draw
+                    handlDefault(turnResult);
+                    return;
+                default:
+                    alert("error: invalid battle result enum ", battleStatus);
+            }
+        }
+        function handlDefault(turnResult) {
+            updatePlayerInfo(turnResult.playerMe);
+            pullHistory();
+            getTurnCards();
         }
 
         function pullHistory() {

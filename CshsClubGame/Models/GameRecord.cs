@@ -158,8 +158,17 @@ namespace CshsClubGame.Models
         public int TargetHp { get; set; }
         public int LootExp { get; set; }
         public int LootRankScore { get; set; }
+        public BattleStatus Status { get; set; }
         public Equipment? LootExpEquipment { get; set; }
         public DateTime BattleTime { get; set; }
+    }
+
+    public enum BattleStatus
+    {
+        NotProceeded,
+        MeWin,
+        TargetWin,
+        Draw
     }
 
     public enum TurnStatus

@@ -271,16 +271,24 @@ namespace CshsClubGame.Models
                 self.AddExp(exp);
                 self.Rank += rankScore;
                 self.AddEquipment(equipment);
+                battleResult.Status = BattleStatus.MeWin;
                 battleResult.LootExp = exp;
                 battleResult.LootRankScore += rankScore;
                 battleResult.LootExpEquipment = equipment;
+                this.MovePlayerToGrave(target);
             }
-            if (self.Hp <= 0)
+            else if (self.Hp > 0 && target.Hp > 0)
             {
+                battleResult.Status = BattleStatus.Draw;
+            }
+            else if (self.Hp <= 0)
+            {
+                battleResult.Status = BattleStatus.TargetWin;
                 this.MovePlayerToGrave(self);
             }
-            if (target.Hp <= 0)
+            else if (target.Hp <= 0)
             {
+                battleResult.Status = BattleStatus.MeWin;
                 this.MovePlayerToGrave(target);
             }
             return battleResult;
