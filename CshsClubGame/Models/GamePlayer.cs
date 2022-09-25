@@ -6,6 +6,7 @@
         public string RoomId { get; set; } = null!;
         public string ClassUnit { get; set; }
         public string Name { get; set; }
+        public PlayerStatus Status { get; set; } = PlayerStatus.Alive;
         public int ImageId { get; set; }
         public int Level { get; set; }
         public int Hp { get; set; }
@@ -97,6 +98,14 @@
             return levelHp + equipHp;
         }
     }
+
+    public enum PlayerStatus
+    {
+        Alive,
+        InGrave,
+        Dead
+    }
+
     public class LevelInfo
     {
         public static readonly LevelInfo[] ExpMap = new LevelInfo[]

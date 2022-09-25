@@ -362,6 +362,12 @@
                 },
                 success: function (turnResult) {
                     console.log(turnResult)
+                    if (turnResult.status === 0) { // not proceeded
+                        alert(turnResult.message + ".  即將重新抽排");
+                        pullHistory();
+                        getTurnCards();
+                        return;
+                    }
                     updatePlayerInfo(turnResult.playerMe);
                     pullHistory();
                     if (turnResult.playerMe.hp <= 0) {

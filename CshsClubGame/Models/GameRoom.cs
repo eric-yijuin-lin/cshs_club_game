@@ -23,6 +23,7 @@
                 return false;
             }
             _players[player.Id] = player;
+            player.RoomId = this.Id;
             return true;
         }
 

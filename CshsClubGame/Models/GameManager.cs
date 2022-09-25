@@ -6,6 +6,7 @@ namespace CshsClubGame.Models
     public class GameManager
     {
         public const string LOBBY_ID = "e6553cf38154794e9a4fb7e3162b9f83"; // MD5 of "publicLobby" 
+        public const string GRAVEYARD_ID = "7e0661d958193467fa8680a1216f4d57"; // MD5 of "R.I.P" 
         private readonly Dictionary<string, Player> _players;
         private readonly Dictionary<string, GameRoom> _rooms;
         private readonly LootHelper _lootHelper;
@@ -17,6 +18,7 @@ namespace CshsClubGame.Models
             _players = new Dictionary<string, Player>();
             _rooms = new Dictionary<string, GameRoom>();
             _rooms.Add(LOBBY_ID, new GameRoom(LOBBY_ID, "大廳", 100));
+            _rooms.Add(GRAVEYARD_ID, new GameRoom(GRAVEYARD_ID, "墓地", int.MaxValue));
             _lootHelper = lootHelper;
             _cardHelper = cardHelper;
             _historyHelper = historyHelper;
@@ -164,6 +166,13 @@ namespace CshsClubGame.Models
             this.MovePlayerOutFromRoom(player);
         }
 
+        private void MovePlayerToGrave(Player player)
+        {
+            this.MovePlayerOutFromRoom(player);
+            _rooms[GRAVEYARD_ID].AddPlayer(player);
+            player.Status = PlayerStatus.InGrave;
+        }
+
         private void MovePlayerOutFromRoom(Player player)
         {
             foreach (var kvp in _rooms)
@@ -230,22 +239,14 @@ namespace CshsClubGame.Models
 
         private string ValidateBattle(Player? player, Player? target)
         {
-            if (player == null || target == null)
-            {
-                return "找不到玩家";
-            }
+            if (player == null) return $"找不到玩家";
+            if (target == null) return $"找不到目標";
+            if (player.Status == PlayerStatus.InGrave) return "你在發動攻擊前被暗算了";
+            if (target.Status == PlayerStatus.InGrave) return "目標墳墓上的草已經跟你一樣高了";
             var room = _rooms[player.RoomId];
             if (!room.IsPlayersInSameRoom(player, target))
             {
                 return "玩家不在同一間房";
-            }
-            if (player.Hp <= 0)
-            {
-                return "你已經死了";
-            }
-            if (target.Hp <= 0)
-            {
-                return "目標已經死了";
             }
             return "OK";
         }
@@ -276,11 +277,11 @@ namespace CshsClubGame.Models
             }
             if (self.Hp <= 0)
             {
-                this.DeletePlayer(self);
+                this.MovePlayerToGrave(self);
             }
             if (target.Hp <= 0)
             {
-                this.DeletePlayer(target);
+                this.MovePlayerToGrave(target);
             }
             return battleResult;
         }

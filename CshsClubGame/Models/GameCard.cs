@@ -21,7 +21,7 @@
             var rand = new Random();
             var candidates = new List<Player>();
             var otherPlayers = allPlayers.Values
-                .Where(x => x.Id != playerId)
+                .Where(x => x.Id != playerId && x.Status == PlayerStatus.Alive)
                 .ToList();
             while (candidates.Count < 5 && otherPlayers.Count > 0 )
             {
