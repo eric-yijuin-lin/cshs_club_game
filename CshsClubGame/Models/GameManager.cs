@@ -76,8 +76,12 @@ namespace CshsClubGame.Models
 
         public GameRoom? JoinRoom(string roomId, Player player)
         {
-            //var room = _rooms[roomId];
-            var room = _rooms[LOBBY_ID]; // 暫時改成只能加大廳
+            if (roomId == "restricted")
+            {
+                roomId = LOBBY_ID;
+            }
+
+            var room = _rooms[roomId]; // 暫時改成只能加大廳
             if (room.IsPlayerInRoom(player.Id))
             {
                 return room;
@@ -93,13 +97,17 @@ namespace CshsClubGame.Models
             return null;
         }
 
-        public Player? GetPlayerById(string playerId)
+        public Player GetPlayerById(string playerId)
         {
             return _players[playerId];
         }
 
-        public Player? GetPlayerByCard(CharaterCard card)
+        public Player? GetPlayerByCard(CharaterCard? card)
         {
+            if (card == null)
+            {
+                return null;
+            }
             if (card.Id == "npc")
             {
                 return new Player(card);
@@ -115,34 +123,33 @@ namespace CshsClubGame.Models
             return _cardHelper.GetTurnCards(playerId, _players);
         }
 
-        public TurnRecord? ProcessTurnCard(string selfId, JsonObject card)
+        public TurnRecord ProcessTurnCard(string selfId, JsonObject card)
         {
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
 
-            TurnRecord turnRecord = null;
             CardType cardType = (CardType)card["cardType"]!.GetValue<int>();
             switch (cardType)
             {
                 case CardType.Character:
+                case CardType.Npc:
                     var charaterCard = card.Deserialize<CharaterCard>(options);
-                    turnRecord = this.ProcessBattleCard(selfId, charaterCard);
-                    break;
+                    return this.ProcessBattleCard(selfId, charaterCard);
                 case CardType.Equipment:
                     var equipmentCard = card.Deserialize<EquipmentCard>(options);
-                    turnRecord = this.ProcessEquipmentCard(selfId, equipmentCard);
-                    break;
+                    return this.ProcessEquipmentCard(selfId, equipmentCard);
                 case CardType.Event:
                     var eventCard = card.Deserialize<EventCard>(options);
-                    turnRecord = this.ProcessEventCard(selfId, eventCard);
-                    break;
+                    return this.ProcessEventCard(selfId, eventCard);
                 default:
-                    return null;
+                    return new TurnRecord(TurnType.Undefined)
+                    {
+                        Status = TurnStatus.Error,
+                        Message = $"無法辨識的卡片 enum：{cardType}"
+                    };
             }
-
-            return turnRecord;
         }
 
         public GameHistoryEntry[] GetHistoryPage()
@@ -171,42 +178,63 @@ namespace CshsClubGame.Models
 
         private TurnRecord ProcessBattleCard(string selfId, CharaterCard? charaterCard)
         {
+            var turnRecord = new TurnRecord(TurnType.Battle);
+            string validateResult = this.ValidateCard(selfId, charaterCard);
+            if (validateResult != "OK")
+            {
+                turnRecord.Message = validateResult;
+                return turnRecord;
+            }
+
+            Player me = this.GetPlayerById(selfId);
+            Player? target = this.GetPlayerByCard(charaterCard);
+            validateResult = this.ValidateBattle(me, target);
+            if (validateResult != "OK")
+            {
+                turnRecord.Message = validateResult;
+                return turnRecord;
+            }
+
+            try
+            {
+                var battleRecord = this.ProcessBattle(me!, target!);
+                me!.SurvivedDay += 1;
+                _historyHelper.AddBattleHistory(me!, target!, battleRecord);
+                turnRecord.PlayerMe = me;
+                turnRecord.BattleRecord = battleRecord;
+            }
+            catch (Exception ex)
+            {
+                turnRecord.Status = TurnStatus.Error;
+                turnRecord.Message = ex.Message;
+                return turnRecord;
+            }
+
+            turnRecord.Status = TurnStatus.Ok;
+            return turnRecord;
+        }
+
+        private string ValidateCard(string selfId, CharaterCard? charaterCard)
+        {
             if (charaterCard == null || string.IsNullOrEmpty(charaterCard.Id))
             {
-                throw new InvalidDataException("對手 ID 不可為空");
+                return "對手 ID 不可為空";
             }
             string? roomId = this.GetRoomIdByPlayerId(selfId);
             if (string.IsNullOrEmpty(roomId))
             {
-                throw new InvalidDataException("找不到玩家的房間");
+                return "找不到玩家的房間";
             }
-
-            Player? me = this.GetPlayerById(selfId);
-            Player? target = this.GetPlayerByCard(charaterCard);
-            string validateResult = this.ValidateBattle(roomId, me, target);
-            if (validateResult != "OK")
-            {
-                throw new InvalidDataException(validateResult);
-            }
-            var battleRecord = this.ProcessBattle(me!, target!);
-            me!.SurvivedDay += 1;
-
-            _historyHelper.AddBattleHistory(me!, target!, battleRecord);
-            return new TurnRecord()
-            {
-                BattleRecord = battleRecord,
-                SelfStatus = me,
-                TurnType = CardType.Character
-            };
+            return "OK";
         }
 
-        private string ValidateBattle(string roomId, Player? player, Player? target)
+        private string ValidateBattle(Player? player, Player? target)
         {
             if (player == null || target == null)
             {
                 return "找不到玩家";
             }
-            var room = _rooms[roomId];
+            var room = _rooms[player.RoomId];
             if (!room.IsPlayersInSameRoom(player, target))
             {
                 return "玩家不在同一間房";
@@ -267,11 +295,11 @@ namespace CshsClubGame.Models
             player!.SurvivedDay += 1;
 
             _historyHelper.AddEquipHistory(player, equip);
-            return new TurnRecord()
+            return new TurnRecord(TurnType.Equipment)
             {
                 BattleRecord = null,
-                SelfStatus = player,
-                TurnType = CardType.Equipment
+                PlayerMe = player,
+                Status = TurnStatus.Ok,
             };
         }
 
@@ -300,11 +328,11 @@ namespace CshsClubGame.Models
             me!.SurvivedDay += 1;
 
             _historyHelper.AddEventHistory(me, eventCard!);
-            return new TurnRecord()
+            return new TurnRecord(TurnType.Event)
             {
                 BattleRecord = null,
-                SelfStatus = me,
-                TurnType = CardType.Event
+                PlayerMe = me,
+                Status = TurnStatus.Ok,
             };
         }
 

@@ -140,9 +140,16 @@ namespace CshsClubGame.Models
 
     public class TurnRecord
     {
-        public CardType TurnType { get; set; } = CardType.Undefined;
-        public Player SelfStatus { get; set; } = null!;
+        public TurnStatus Status { get; set; } = TurnStatus.NotProceeded;
+        public TurnType TurnType { get; set; }
+        public string? Message { get; set; }
+        public Player? PlayerMe { get; set; }
         public BattleRecord? BattleRecord { get; set; }
+
+        public TurnRecord(TurnType type)
+        {
+            this.TurnType = type;
+        }
     }
 
     public class BattleRecord
@@ -153,5 +160,12 @@ namespace CshsClubGame.Models
         public int LootRankScore { get; set; }
         public Equipment? LootExpEquipment { get; set; }
         public DateTime BattleTime { get; set; }
+    }
+
+    public enum TurnStatus
+    {
+        NotProceeded,
+        Ok,
+        Error
     }
 }

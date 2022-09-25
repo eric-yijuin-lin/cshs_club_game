@@ -102,15 +102,11 @@ namespace CshsClubGame.Controllers
         }
 
         [HttpPost("SelectCard")]
-        public ActionResult SelectCard([FromForm] SelectCardRequest request)
+        public TurnRecord SelectCard([FromForm] SelectCardRequest request)
         {
             var card = JsonObject.Parse(request.CardJson)!.AsObject();
             var record = _gameManager.ProcessTurnCard(request.SelfId, card);
-            if (record == null)
-            {
-                return BadRequest("未定義的卡片類型");
-            }
-            return Ok(record);
+            return record;
         }
 
         [HttpGet("PullHistory")]

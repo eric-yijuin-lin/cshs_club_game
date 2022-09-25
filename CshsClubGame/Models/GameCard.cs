@@ -226,6 +226,14 @@
         Event
     }
 
+    public enum TurnType
+    {
+        Undefined,
+        Battle,
+        Equipment,
+        Event
+    }
+
     public enum ItemQuality
     {
         Normal,

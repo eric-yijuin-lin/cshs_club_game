@@ -362,9 +362,9 @@
                 },
                 success: function (turnResult) {
                     console.log(turnResult)
-                    updatePlayerInfo(turnResult.selfStatus);
+                    updatePlayerInfo(turnResult.playerMe);
                     pullHistory();
-                    if (turnResult.selfStatus.hp <= 0) {
+                    if (turnResult.playerMe.hp <= 0) {
                         if (confirm("你的角色掛了，是否重新開始?")) {
                             location.reload();
                         }
