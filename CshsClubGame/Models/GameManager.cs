@@ -223,6 +223,7 @@ namespace CshsClubGame.Models
             {
                 turnRecord.Status = TurnStatus.Error;
                 turnRecord.Message = ex.Message;
+                Console.WriteLine($"Server Error: [{DateTime.Now.ToString("HH:mm:ss")}] {ex.Message}");
                 return turnRecord;
             }
 
